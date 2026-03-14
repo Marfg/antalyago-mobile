@@ -273,7 +273,7 @@
 
 <!-- MODEL LOADING OVERLAY -->
 <div id="model-overlay">
-  <div class="mlogo">囲碁 · KataNet</div>
+  <div class="mlogo">AntalyaGO</div>
   <div class="msub">Yapay Zeka yükleniyor</div>
   <div class="pw">
     <div class="btrack"><div class="bfill" id="bfill"></div></div>
@@ -285,7 +285,7 @@
 <div class="topbar">
   <div class="topbar-left">
     <a class="back-btn" href="index.html">← Ana Sayfa</a>
-    <span class="page-title">Etüd — KataNet Antrenman</span>
+    <span class="page-title">Etüd — AntalyaGO Antrenman</span>
     <span class="engine-badge" id="engine-badge">KataGo · TF.js</span>
   </div>
   <div class="katago-status">
@@ -377,7 +377,7 @@
       <div class="turn-stone black" id="turn-stone"></div>
       <span id="turn-text">Oyun başlatılmadı</span>
       <div class="thinking-badge" id="thinking-badge">
-        <span>KataNet düşünüyor</span>
+        <span>düşünüyor</span>
         <div class="think-dots"><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -432,7 +432,7 @@
     </div>
 
     <div>
-      <div class="panel-title" style="margin-bottom:.5rem">KataNet Değerlendirmesi</div>
+      <div class="panel-title" style="margin-bottom:.5rem">AntalyaGO Değerlendirmesi</div>
       <div id="analysis-box">
         <div style="color:var(--muted);font-size:.78rem;">Oyun başladığında analiz burada görünecek.</div>
       </div>
@@ -546,7 +546,7 @@ function onModelReady() {
   G.modelOk = true;
   document.getElementById('model-overlay').classList.add('hidden');
   document.getElementById('sdot').className    = 'status-dot ready';
-  document.getElementById('slabel').textContent = 'KataNet Hazır';
+  document.getElementById('slabel').textContent = 'Hazır';
   document.getElementById('start-btn').disabled = false;
   document.getElementById('engine-badge').textContent = 'AntalyaGO ✓';
 }
@@ -896,7 +896,7 @@ function setColor(c) {
 function updateTurn() {
   const isP=G.turn===G.playerColor;
   document.getElementById('turn-stone').className='turn-stone '+G.turn;
-  document.getElementById('turn-text').textContent=(G.turn==='black'?'Siyah':'Beyaz')+"'ın sırası"+(isP?' (Sen)':' (KataNet)');
+  document.getElementById('turn-text').textContent=(G.turn==='black'?'Siyah':'Beyaz')+"'ın sırası"+(isP?' (Sen)':' (AntalyaGO)');
 }
 
 function updateScores() {
