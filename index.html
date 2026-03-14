@@ -2,85 +2,65 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antalya Go Projesi</title>
     
-    <script src="https://unpkg.com/wgo@2.3.1/wgo.min.js"></script>
-    <script src="https://unpkg.com/wgo@2.3.1/wgo.player.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/wgo@2.3.1/wgo.player.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wgo/2.3.1/wgo.min.js"></script>
     
     <style>
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: sans-serif; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            background-color: #e9e4d1; 
-            padding: 20px;
+            background-color: #f4f1ea; 
         }
-        /* Goban'ın (Tahtanın) görüneceği kapsayıcı */
+        /* Tahtanın çerçevesi */
         #goban-container { 
             width: 500px; 
             height: 500px; 
-            background: #dcb35c; /* Geleneksel Kaya (Kayawood) rengi */
-            border: 5px solid #5d4037;
-            border-radius: 4px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin: 20px auto;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        #status {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
+        #status { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #444; }
     </style>
 </head>
 <body>
 
     <h1>Antalya Go Topluluğu</h1>
-    <div id="status">Kütüphane kontrol ediliyor...</div>
+    <div id="status">Kütüphane Bekleniyor...</div>
 
     <div id="goban-container">
-        <div id="my-goban" style="width: 100%; height: 100%;"></div>
+        <div id="my-goban" style="width: 500px; height: 500px;"></div>
     </div>
 
     <script>
-        window.onload = function() {
-            // WGo yüklendi mi kontrol et
-            if (typeof WGo === "undefined") {
-                document.getElementById("status").innerText = "Hata: WGo kütüphanesi yüklenemedi!";
-                return;
+        // Sayfa yüklendiğinde değil, WGo kütüphanesi hazır olduğunda çalışması için bir kontrol
+        function initializeGo() {
+            if (typeof WGo !== "undefined") {
+                console.log("WGo Başarıyla Yüklendi");
+                
+                var turn = WGo.B;
+                var board = new WGo.Board(document.getElementById("my-goban"), {
+                    width: 500,
+                    size: 19
+                });
+
+                document.getElementById("status").innerText = "Sıra Siyah'ta";
+
+                board.addEventListener("click", function(x, y) {
+                    board.addObject({x: x, y: y, c: turn});
+                    turn = (turn === WGo.B) ? WGo.W : WGo.B;
+                    document.getElementById("status").innerText = "Sıra: " + (turn === WGo.B ? "Siyah" : "Beyaz");
+                });
+            } else {
+                // Eğer yüklenmediyse yarım saniye sonra tekrar dene
+                console.log("WGo henüz hazır değil, tekrar deneniyor...");
+                setTimeout(initializeGo, 500);
             }
+        }
 
-            var turn = WGo.B; // Siyahla başla
-            
-            // 2. Tahtayı oluştur
-            var board = new WGo.Board(document.getElementById("my-goban"), {
-                width: 500,
-                size: 19
-            });
-
-            document.getElementById("status").innerText = "Sıra: SİYAH";
-
-            // 3. Tıklama özelliği
-            board.addEventListener("click", function(x, y) {
-                // Aynı yere taş konulmasını engellemek için basit kontrol
-                board.addObject({x: x, y: y, c: turn});
-
-                // Sırayı değiştir
-                if (turn === WGo.B) {
-                    turn = WGo.W;
-                    document.getElementById("status").innerText = "Sıra: BEYAZ";
-                } else {
-                    turn = WGo.B;
-                    document.getElementById("status").innerText = "Sıra: SİYAH";
-                }
-            });
-
-            // Merkeze bir yıldız noktası işareti koyalım (Opsiyonel)
-            board.addObject({x: 9, y: 9, c: WGo.W});
-        };
+        // Başlat
+        initializeGo();
     </script>
 
 </body>
