@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antalya Go Projesi</title>
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/wgo/2.3.1/wgo.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-color: #f0e6d2; 
+        }
+        #goban-box { 
+            margin: 20px; 
+            padding: 10px;
+            background: #d2b48c; /* Ahşap rengi arkalık */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        /* Tahta boyutunu burası belirler */
+        #my-goban { 
+            width: 450px; 
+            height: 450px; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Antalya Go Topluluğu</h1>
+    <p id="status">Tahta yükleniyor...</p>
+
+    <div id="goban-box">
+        <div id="my-goban"></div>
+    </div>
+
+    <script>
+        // Sayfa tamamen yüklendiğinde çalıştır
+        window.onload = function() {
+            try {
+                // 1. Tahtayı oluştur
+                var board = new WGo.Board(document.getElementById("my-goban"), {
+                    width: 450,
+                    size: 19,
+                    section: {top: -0.5, left: -0.5, right: -0.5, bottom: -0.5}
+                });
+
+                document.getElementById("status").innerText = "Tahta Hazır! Tıklayarak siyah taş koyabilirsin.";
+
+                // 2. Tıklama özelliği
+                board.addEventListener("click", function(x, y) {
+                    board.addObject({x: x, y: y, c: WGo.B});
+                });
+
+                // 3. Test taşı (Tengen)
+                board.addObject({x: 9, y: 9, c: WGo.W});
+
+            } catch (err) {
+                document.getElementById("status").innerText = "Hata oluştu: " + err.message;
+                console.error(err);
+            }
+        };
+    </script>
+
+</body>
+</html>
