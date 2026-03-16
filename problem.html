@@ -246,6 +246,9 @@
   </div>
 </div>
 
+<!-- SGF STATUS BAR -->
+<div id="sgf-status" style="display:none;text-align:center;padding:.4rem;background:var(--wood-light);border-bottom:1px solid var(--border);font-size:.78rem;color:var(--wood-dark);font-weight:600;"></div>
+
 <!-- MAIN -->
 <div class="main">
 
@@ -412,6 +415,8 @@ const inB  = (x,y,s) => x>=0&&y>=0&&x<s&&y<s;
 let currentProblem = null;
 let boardGrid      = [];
 let boardSize      = 9;
+let ALL_PROBLEMS   = [...PROBLEMS]; // başlangıçta hazır problemler
+let sgfLoaded      = false;
 let solved         = new Set(JSON.parse(localStorage.getItem('go_solved')||'[]'));
 let stats = JSON.parse(localStorage.getItem('go_stats')||'{"correct":0,"wrong":0,"total":0}');
 let filter = { type:'all', level:'all' };
@@ -656,7 +661,7 @@ function setFilter(key, val) {
 }
 
 function filteredProblems() {
-  return PROBLEMS.filter(p => {
+  return ALL_PROBLEMS.filter(p => {
     const typeOk  = filter.type  === 'all' || p.type  === filter.type;
     const levelOk = filter.level === 'all' || p.level === filter.level;
     return typeOk && levelOk;
@@ -666,7 +671,7 @@ function filteredProblems() {
 function renderProblemList() {
   const list = document.getElementById('problem-list');
   const probs = filteredProblems();
-  document.getElementById('total-count').textContent = PROBLEMS.length;
+  document.getElementById('total-count').textContent = ALL_PROBLEMS.length;
   list.innerHTML = '';
 
   probs.forEach(p => {
@@ -731,7 +736,10 @@ function nextProblem() {
 function loadRandom() {
   const probs = filteredProblems();
   if (!probs.length) return;
-  const p = probs[Math.floor(Math.random()*probs.length)];
+  // Çözülmemiş problemleri önceliklendir
+  const unsolved = probs.filter(p => !solved.has(p.id));
+  const pool = unsolved.length > 0 ? unsolved : probs;
+  const p = pool[Math.floor(Math.random()*pool.length)];
   loadProblem(p);
 }
 
@@ -754,8 +762,8 @@ function updateStats() {
   // Tür bazında
   document.querySelectorAll('.type-progress').forEach(el => {
     const type = el.dataset.type;
-    const total  = PROBLEMS.filter(p=>p.type===type).length;
-    const done   = PROBLEMS.filter(p=>p.type===type&&solved.has(p.id)).length;
+    const total  = ALL_PROBLEMS.filter(p=>p.type===type).length;
+    const done   = ALL_PROBLEMS.filter(p=>p.type===type&&solved.has(p.id)).length;
     el.innerHTML = `
       <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:.2rem">
         <span>${typeLabel(type)}</span>
@@ -769,7 +777,7 @@ function updateStats() {
 
   // Çözülenler
   const solvedNames = [...solved].map(id => {
-    const p = PROBLEMS.find(p=>p.id===id);
+    const p = ALL_PROBLEMS.find(p=>p.id===id);
     return p ? p.title : id;
   });
   document.getElementById('solved-list').textContent =
@@ -786,6 +794,13 @@ function resetStats() {
   renderProblemList();
 }
 
+/* SGF'den gelen problemi manuel olarak da yükleyebilirsin:
+   SGFParser.loadSingle('problems/ozel.sgf', 'tsumego').then(probs => {
+     ALL_PROBLEMS = [...probs, ...ALL_PROBLEMS];
+     renderProblemList();
+   });
+*/
+
 /* ═══════════════════════════════════════
    YARDIMCILAR
 ═══════════════════════════════════════ */
@@ -799,11 +814,55 @@ function levelLabel(l) {
 /* ═══════════════════════════════════════
    BAŞLAT
 ═══════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded', () => {
+/* ═══════════════════════════════════════
+   SGF YÜKLEME
+   problems/ klasöründeki koleksiyon dosyaları
+   Dosya yoksa sadece hazır problemlerle devam eder
+═══════════════════════════════════════ */
+
+// SGF koleksiyon tanımları
+// Sunucuya yüklediğin dosya adlarını buraya ekle
+const SGF_COLLECTIONS = [
+  { url: 'problems/tsumego.sgf',  type: 'tsumego',  level: null },
+  { url: 'problems/joseki.sgf',   type: 'joseki',   level: null },
+  { url: 'problems/tesuji.sgf',   type: 'tesuji',   level: null },
+  { url: 'problems/endgame.sgf',  type: 'endgame',  level: null },
+];
+
+async function loadSGFCollections() {
+  const statusEl = document.getElementById('sgf-status');
+  statusEl.textContent = 'SGF dosyaları yükleniyor…';
+  statusEl.style.display = 'block';
+
+  try {
+    const sgfProblems = await SGFParser.loadCollections(SGF_COLLECTIONS);
+    if (sgfProblems.length > 0) {
+      // SGF problemlerini ALL_PROBLEMS'a ekle (hazır problemlerin önüne)
+      ALL_PROBLEMS = [...sgfProblems, ...PROBLEMS];
+      sgfLoaded = true;
+      statusEl.textContent = `✓ ${sgfProblems.length} SGF problemi yüklendi`;
+      setTimeout(() => statusEl.style.display = 'none', 2500);
+    } else {
+      statusEl.textContent = 'SGF dosyası bulunamadı, hazır problemler kullanılıyor.';
+      setTimeout(() => statusEl.style.display = 'none', 3000);
+    }
+  } catch(e) {
+    statusEl.textContent = 'SGF yükleme hatası, hazır problemler kullanılıyor.';
+    setTimeout(() => statusEl.style.display = 'none', 3000);
+  }
+
   renderProblemList();
   updateStats();
-  // İlk problemi yükle
-  loadProblem(PROBLEMS[0]);
+  loadProblem(ALL_PROBLEMS[0]);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Önce hazır problemleri göster
+  renderProblemList();
+  updateStats();
+  loadProblem(ALL_PROBLEMS[0]);
+  // Sonra SGF dosyalarını arka planda yükle
+  loadSGFCollections();
 });
 </script>
 </body>
