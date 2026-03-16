@@ -10,22 +10,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f0f0f;
-      --bg2:       #181818;
-      --bg3:       #222222;
-      --border:    rgba(255,255,255,0.08);
-      --border-h:  rgba(255,255,255,0.16);
-      --text:      #f0ede8;
-      --text2:     #9a9690;
-      --text3:     #5a5754;
-      --gold:      #c8a84b;
-      --gold2:     #e8c870;
-      --gold-dim:  rgba(200,168,75,0.12);
-      --gold-dim2: rgba(200,168,75,0.06);
-      --white005:  rgba(255,255,255,0.05);
-      --white010:  rgba(255,255,255,0.10);
-      --r:         12px;
-      --r2:        8px;
+      --bg:         #e8e4de;
+      --bg-light:   #f0ece6;
+      --bg-dark:    #d8d4ce;
+      --shadow-l:   rgba(255,255,255,0.85);
+      --shadow-d:   rgba(180,168,152,0.6);
+      --text:       #3a3530;
+      --text2:      #7a7268;
+      --text3:      #a09888;
+      --gold:       #b8943a;
+      --gold2:      #d4aa50;
+      --gold-soft:  rgba(184,148,58,0.15);
+      --r:          18px;
+      --r2:         12px;
+      --r3:         24px;
+
+      /* Neumorphic gölgeler */
+      --nm-out:     6px 6px 14px var(--shadow-d), -6px -6px 14px var(--shadow-l);
+      --nm-out-sm:  4px 4px 10px var(--shadow-d), -4px -4px 10px var(--shadow-l);
+      --nm-in:      inset 4px 4px 10px var(--shadow-d), inset -4px -4px 10px var(--shadow-l);
+      --nm-in-sm:   inset 2px 2px 6px var(--shadow-d), inset -2px -2px 6px var(--shadow-l);
     }
 
     html, body {
@@ -36,34 +40,13 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── GRID ARKA PLAN ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none; z-index: 0;
-    }
-
-    /* Sağ üst ışık efekti */
-    body::after {
-      content: '';
-      position: fixed; top: -200px; right: -200px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(200,168,75,.07) 0%, transparent 70%);
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ── WRAPPER ── */
+    /* ── SAYFA ── */
     .page {
-      position: relative; z-index: 1;
       min-height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 3rem 1.5rem;
-      gap: 3.5rem;
+      gap: 3rem;
     }
 
     /* ── HEADER ── */
@@ -71,221 +54,224 @@
 
     .logo-row {
       display: flex; align-items: center; justify-content: center;
-      gap: .75rem; margin-bottom: 1.25rem;
+      gap: .85rem; margin-bottom: 1.5rem;
     }
 
-    .logo-stones {
-      display: flex; gap: 6px; align-items: center;
+    /* Neumorphic taş çifti */
+    .nm-stones {
+      display: flex; gap: 8px; align-items: center;
     }
 
-    .ls {
-      width: 14px; height: 14px; border-radius: 50%;
-      flex-shrink: 0;
+    .nm-stone {
+      width: 18px; height: 18px; border-radius: 50%;
     }
-    .ls.b { background: #e8e4de; box-shadow: inset -1px -1px 2px rgba(0,0,0,.4); }
-    .ls.w { background: #2a2a2a; border: 1px solid rgba(255,255,255,.15); }
+    .nm-stone.b {
+      background: #d8d4ce;
+      box-shadow: var(--nm-out-sm);
+    }
+    .nm-stone.w {
+      background: var(--bg-light);
+      box-shadow: var(--nm-out-sm);
+    }
 
-    .logo-divider {
-      width: 1px; height: 20px;
-      background: var(--border-h);
+    .logo-sep {
+      width: 1px; height: 22px;
+      background: linear-gradient(to bottom, transparent, var(--shadow-d), transparent);
     }
 
     .logo-tag {
-      font-size: 11px; font-weight: 500;
-      letter-spacing: .2em; text-transform: uppercase;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase;
       color: var(--gold);
     }
 
     h1 {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(2.8rem, 7vw, 4.5rem);
+      font-size: clamp(3rem, 8vw, 5rem);
       font-weight: 700;
       letter-spacing: -.02em;
       color: var(--text);
       line-height: 1;
-      margin-bottom: .75rem;
+      margin-bottom: .6rem;
+
+      /* Kabartma efekti */
+      text-shadow:
+        2px 2px 4px var(--shadow-d),
+        -1px -1px 2px var(--shadow-l);
     }
 
     .tagline {
-      font-size: .95rem;
+      font-size: .88rem;
       font-weight: 300;
       color: var(--text2);
-      letter-spacing: .04em;
+      letter-spacing: .12em;
+      text-transform: uppercase;
     }
 
     /* ── KART IZGARASI ── */
     .cards {
       display: grid;
-      grid-template-columns: repeat(2, 280px);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
+      grid-template-columns: repeat(2, 260px);
+      gap: 1.5rem;
     }
 
     /* ── KART ── */
     .card {
       position: relative;
-      background: var(--bg2);
-      padding: 2rem 1.75rem;
+      background: var(--bg);
+      border-radius: var(--r3);
+      padding: 1.75rem 1.5rem;
       text-decoration: none;
       color: var(--text);
-      display: flex; flex-direction: column; gap: 1rem;
-      transition: background .2s;
-      overflow: hidden;
+      display: flex; flex-direction: column; gap: 1.1rem;
+      box-shadow: var(--nm-out);
+      transition: box-shadow .25s ease, transform .2s ease;
+      cursor: pointer;
     }
 
-    .card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--gold-dim2);
-      opacity: 0; transition: opacity .2s;
+    .card:hover {
+      box-shadow:
+        8px 8px 18px var(--shadow-d),
+        -8px -8px 18px var(--shadow-l);
+      transform: translateY(-2px);
     }
 
-    .card:hover { background: var(--bg3); }
-    .card:hover::before { opacity: 1; }
-
-    /* Köşe aksanı */
-    .card::after {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 0; height: 2px;
-      background: var(--gold);
-      transition: width .25s ease;
+    .card:active {
+      box-shadow: var(--nm-in);
+      transform: translateY(0);
     }
-    .card:hover::after { width: 100%; }
 
-    /* İkon */
+    /* ── KART İKON ── */
     .card-icon {
-      width: 40px; height: 40px;
+      width: 48px; height: 48px;
       border-radius: var(--r2);
-      background: var(--white005);
-      border: 1px solid var(--border);
+      background: var(--bg);
+      box-shadow: var(--nm-in-sm);
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      transition: border-color .2s, background .2s;
       flex-shrink: 0;
     }
-    .card:hover .card-icon {
-      background: var(--gold-dim);
-      border-color: rgba(200,168,75,.3);
-    }
 
-    /* Mini tahta ikonu */
+    /* Mini board ikonu */
     .mini-board {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1.5px;
-      width: 24px; height: 24px;
+      gap: 1px;
+      width: 26px; height: 26px;
       padding: 3px;
     }
-    .mc {
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .mc::before, .mc::after {
-      content: '';
-      position: absolute;
-      background: rgba(255,255,255,.25);
-    }
+    .mc { position: relative; display: flex; align-items: center; justify-content: center; }
+    .mc::before, .mc::after { content: ''; position: absolute; background: rgba(120,100,70,.3); }
     .mc::before { width: 100%; height: .5px; top: 50%; }
     .mc::after  { width: .5px; height: 100%; left: 50%; }
-    .ms {
-      width: 6px; height: 6px; border-radius: 50%;
-      position: relative; z-index: 1;
+    .ms { width: 6px; height: 6px; border-radius: 50%; position: relative; z-index: 1; }
+    .ms.b {
+      background: #5a5248;
+      box-shadow: 1px 1px 2px rgba(0,0,0,.25), -0.5px -0.5px 1px rgba(255,255,255,.3);
     }
-    .ms.b { background: #e8e4de; }
-    .ms.w { background: #3a3a3a; border: .5px solid rgba(255,255,255,.2); }
+    .ms.w {
+      background: var(--bg-light);
+      box-shadow: 1px 1px 2px rgba(0,0,0,.15), -0.5px -0.5px 1px rgba(255,255,255,.8);
+    }
 
-    /* Başlık & açıklama */
-    .card-body { display: flex; flex-direction: column; gap: .4rem; flex: 1; }
+    /* Live dot */
+    .live-dot-wrap {
+      position: relative; width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .live-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 8px rgba(184,148,58,.4);
+    }
+    .live-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1.5px solid rgba(184,148,58,.35);
+      animation: ring 2.2s ease-out infinite;
+    }
+    .live-ring:nth-child(2) { animation-delay: .8s; }
+    @keyframes ring {
+      0%   { transform: scale(.3); opacity: .9; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+
+    /* ── KART BODY ── */
+    .card-body { display: flex; flex-direction: column; gap: .35rem; flex: 1; }
 
     .card-title {
-      font-size: 1rem; font-weight: 600;
+      font-size: .97rem; font-weight: 600;
       color: var(--text); letter-spacing: -.01em;
     }
 
     .card-desc {
-      font-size: .82rem; font-weight: 300;
-      color: var(--text2); line-height: 1.6;
+      font-size: .8rem; font-weight: 300;
+      color: var(--text2); line-height: 1.65;
     }
 
-    /* Alt ok */
-    .card-arrow {
-      display: flex; align-items: center; gap: .35rem;
-      font-size: .75rem; font-weight: 500;
-      color: var(--text3); letter-spacing: .05em;
-      text-transform: uppercase;
-      transition: color .2s, gap .2s;
-      margin-top: auto;
+    /* ── KART ALT BANT ── */
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: .85rem;
+      border-top: 1px solid transparent;
+      background:
+        linear-gradient(var(--bg), var(--bg)) padding-box,
+        linear-gradient(90deg, var(--shadow-d), var(--shadow-l)) border-box;
     }
-    .card-arrow span { transition: transform .2s; }
-    .card:hover .card-arrow { color: var(--gold); gap: .5rem; }
-    .card:hover .card-arrow span { transform: translateX(3px); }
+
+    .card-cta {
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--gold);
+      transition: letter-spacing .2s;
+    }
+    .card:hover .card-cta { letter-spacing: .12em; }
+
+    .card-arrow-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg);
+      box-shadow: var(--nm-out-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text2);
+      transition: box-shadow .2s, color .2s;
+      flex-shrink: 0;
+    }
+    .card:hover .card-arrow-btn {
+      box-shadow: var(--nm-in-sm);
+      color: var(--gold);
+    }
 
     /* ── FOOTER ── */
     .footer {
-      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      display: flex; flex-direction: column; align-items: center; gap: .6rem;
     }
 
-    .footer-divider {
-      width: 40px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-h), transparent);
+    /* Neumorphic ayraç */
+    .nm-divider {
+      width: 60px; height: 3px;
+      border-radius: 2px;
+      background: var(--bg);
+      box-shadow: var(--nm-in-sm);
     }
 
     .footer-text {
-      font-size: .72rem; font-weight: 300;
-      color: var(--text3); letter-spacing: .08em;
+      font-size: .7rem; font-weight: 300;
+      color: var(--text3); letter-spacing: .1em;
     }
-
-    .footer-text a {
-      color: var(--text2);
-      text-decoration: none;
-      transition: color .15s;
-    }
+    .footer-text a { color: var(--text2); text-decoration: none; transition: color .15s; }
     .footer-text a:hover { color: var(--gold); }
 
-    /* ── LIVE DOT ── */
-    .live-dot-wrap {
-      position: relative;
-      width: 20px; height: 20px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .live-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--gold);
-    }
-    .live-ring {
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      border: 1px solid rgba(200,168,75,.5);
-      animation: ring 2s ease-out infinite;
-    }
-    .live-ring:nth-child(2) { animation-delay: .7s; }
-
-    @keyframes ring {
-      0%   { transform: scale(.4); opacity: .8; }
-      100% { transform: scale(1.8); opacity: 0; }
-    }
-
-    /* ── ANİMASYONLAR ── */
+    /* ── ANIMASYONLAR ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .header { animation: fadeUp .6s ease both; }
-    .cards  { animation: fadeUp .6s .12s ease both; }
-    .footer { animation: fadeUp .6s .22s ease both; }
+    .header { animation: fadeUp .7s ease both; }
+    .cards  { animation: fadeUp .7s .15s ease both; }
+    .footer { animation: fadeUp .7s .28s ease both; }
 
     /* ── RESPONSIVE ── */
-    @media(max-width: 620px) {
-      .cards { grid-template-columns: 1fr; }
-    }
-
-    @media(max-width: 380px) {
-      .card { padding: 1.5rem 1.25rem; }
+    @media(max-width: 580px) {
+      .cards { grid-template-columns: 1fr; gap: 1.25rem; }
+      .card  { padding: 1.5rem 1.25rem; }
     }
   </style>
 </head>
@@ -295,12 +281,12 @@
   <!-- HEADER -->
   <div class="header">
     <div class="logo-row">
-      <div class="logo-stones">
-        <div class="ls b"></div>
-        <div class="ls w"></div>
-        <div class="ls b"></div>
+      <div class="nm-stones">
+        <div class="nm-stone b"></div>
+        <div class="nm-stone w"></div>
+        <div class="nm-stone b"></div>
       </div>
-      <div class="logo-divider"></div>
+      <div class="logo-sep"></div>
       <span class="logo-tag">Antalya</span>
     </div>
     <h1>GO</h1>
@@ -313,13 +299,16 @@
     <!-- ÖĞREN -->
     <a class="card" href="ogren.html">
       <div class="card-icon">
-        <span style="font-size:18px">📖</span>
+        <span style="font-size:20px">📖</span>
       </div>
       <div class="card-body">
         <div class="card-title">Öğren</div>
         <div class="card-desc">Adım adım interaktif derslerle Go'yu sıfırdan öğren.</div>
       </div>
-      <div class="card-arrow">Derse başla <span>→</span></div>
+      <div class="card-footer">
+        <span class="card-cta">Derse başla</span>
+        <div class="card-arrow-btn">→</div>
+      </div>
     </a>
 
     <!-- ETÜD -->
@@ -348,19 +337,25 @@
         <div class="card-title">Etüd</div>
         <div class="card-desc">KataNet yapay zekasına karşı antrenman yap, seviyeni geliştir.</div>
       </div>
-      <div class="card-arrow">Antrenmana başla <span>→</span></div>
+      <div class="card-footer">
+        <span class="card-cta">Antrenmana başla</span>
+        <div class="card-arrow-btn">→</div>
+      </div>
     </a>
 
     <!-- PROBLEM -->
     <a class="card" href="problem.html">
       <div class="card-icon">
-        <span style="font-size:18px">🧩</span>
+        <span style="font-size:20px">🧩</span>
       </div>
       <div class="card-body">
         <div class="card-title">Problem</div>
         <div class="card-desc">Tsumego, joseki, tesuji ve endgame problemleriyle kendini sına.</div>
       </div>
-      <div class="card-arrow">Problemlere bak <span>→</span></div>
+      <div class="card-footer">
+        <span class="card-cta">Problemlere bak</span>
+        <div class="card-arrow-btn">→</div>
+      </div>
     </a>
 
     <!-- CANLI MAÇ -->
@@ -376,14 +371,17 @@
         <div class="card-title">Canlı Maç</div>
         <div class="card-desc">Google hesabınla giriş yap, arkadaşlarınla veya herkesle oyna.</div>
       </div>
-      <div class="card-arrow">Maça katıl <span>→</span></div>
+      <div class="card-footer">
+        <span class="card-cta">Maça katıl</span>
+        <div class="card-arrow-btn">→</div>
+      </div>
     </a>
 
   </div>
 
   <!-- FOOTER -->
   <div class="footer">
-    <div class="footer-divider"></div>
+    <div class="nm-divider"></div>
     <p class="footer-text">
       Powered by <a href="https://antalyago.org" target="_blank">AntalyaGO.org</a>
     </p>
