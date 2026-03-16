@@ -66,7 +66,7 @@
       width: 18px; height: 18px; border-radius: 50%;
     }
     .nm-stone.b {
-      background: #d8d4ce;
+      background: #1a1614;
       box-shadow: var(--nm-out-sm);
     }
     .nm-stone.w {
@@ -239,6 +239,24 @@
       color: var(--gold);
     }
 
+    /* ── NEFES ALAN TAŞ ── */
+    .breath-stone {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #3a3632, #0e0c0b);
+      box-shadow:
+        0 4px 16px rgba(0,0,0,.35),
+        0 2px 6px rgba(0,0,0,.25),
+        inset -1px -1px 3px rgba(0,0,0,.4),
+        inset 1px 1px 2px rgba(255,255,255,.08);
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%   { opacity: .15; transform: scale(.82); box-shadow: 0 2px 8px rgba(0,0,0,.2), inset -1px -1px 3px rgba(0,0,0,.4), inset 1px 1px 2px rgba(255,255,255,.08); }
+      50%  { opacity: 1;   transform: scale(1);   box-shadow: 0 6px 22px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3), inset -1px -1px 3px rgba(0,0,0,.4), inset 1px 1px 2px rgba(255,255,255,.08); }
+      100% { opacity: .15; transform: scale(.82); box-shadow: 0 2px 8px rgba(0,0,0,.2), inset -1px -1px 3px rgba(0,0,0,.4), inset 1px 1px 2px rgba(255,255,255,.08); }
+    }
+
     /* ── FOOTER ── */
     .footer {
       display: flex; flex-direction: column; align-items: center; gap: .6rem;
@@ -381,6 +399,7 @@
 
   <!-- FOOTER -->
   <div class="footer">
+    <div class="breath-stone"></div>
     <div class="nm-divider"></div>
     <p class="footer-text">
       Powered by <a href="https://antalyago.org" target="_blank">AntalyaGO.org</a>
