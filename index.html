@@ -83,7 +83,7 @@
       box-shadow: var(--nm-out-s);
     }
     .nm-stone.w {
-      background: var(--bg-l);
+      background: #d0ccc6;
       box-shadow: var(--nm-out-s);
     }
 
@@ -152,13 +152,14 @@
 
     .card:hover {
       box-shadow: var(--nm-out-h);
-      transform: translateY(-3px);
+      transform: scale(1.035);
     }
     .card:hover::before { opacity: 1; }
 
     .card:active {
       box-shadow: var(--nm-in);
-      transform: translateY(0);
+      transform: scale(0.97);
+      transition: box-shadow .12s ease, transform .1s ease;
     }
 
     /* ── İKON ── */
@@ -192,8 +193,8 @@
       box-shadow: 1px 1px 2px rgba(0,0,0,.6), -0.5px -0.5px 1px rgba(255,255,255,.06);
     }
     .ms.w {
-      background:var(--bg-l);
-      box-shadow: 1px 1px 2px rgba(0,0,0,.5), -0.5px -0.5px 1px rgba(255,255,255,.12);
+      background:#c8c4be;
+      box-shadow: 1px 1px 2px rgba(0,0,0,.5), -0.5px -0.5px 1px rgba(255,255,255,.6);
     }
 
     /* Live dot */
@@ -223,20 +224,20 @@
 
     .card-cta {
       font-size:.72rem; font-weight:500; letter-spacing:.08em;
-      text-transform:uppercase; color:var(--text2);
-      transition:color .2s, letter-spacing .2s;
+      text-transform:uppercase; color:var(--gold);
+      transition:letter-spacing .2s;
     }
-    .card:hover .card-cta { color:var(--gold); letter-spacing:.12em; }
+    .card:hover .card-cta { letter-spacing:.12em; }
 
     .card-btn {
       width:26px; height:26px; border-radius:50%;
       background:var(--bg);
       box-shadow:var(--nm-out-s);
       display:flex; align-items:center; justify-content:center;
-      font-size:11px; color:var(--text3);
-      transition:box-shadow .22s, color .2s;
+      font-size:11px; color:var(--gold);
+      transition:box-shadow .22s;
     }
-    .card:hover .card-btn { box-shadow:var(--nm-in-s); color:var(--gold); }
+    .card:hover .card-btn { box-shadow:var(--nm-in-s); }
 
     /* ── FOOTER ── */
     .footer { display:flex; flex-direction:column; align-items:center; gap:.7rem; }
