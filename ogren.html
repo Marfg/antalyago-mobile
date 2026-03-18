@@ -280,15 +280,15 @@ const CURRICULUM = [
       { text:`<p>Taşlar bir kez konulduktan sonra <strong>hareket ettirilemez</strong> — sadece yakalanarak kaldırılabilir.</p><div class="highlight">Go\'da taşlar hareket etmez, sadece eklenir veya kaldırılır.</div>`, board:[{color:'W',x:4,y:4}], auto:true, size:9, fb:{t:'Bu beyaz taş artık o noktada sabit.',c:'info'} },
     ]},
 
-    { id:'l2', title:'Özgürlükler (Liberty)', steps:[
-      { text:`<p>Her taşın komşu boş noktalarına <strong class="term">özgürlük</strong> (liberty) denir.</p><p>Ortadaki bir taşın <strong>4 özgürlüğü</strong> vardır (üst, alt, sol, sağ).</p>`, board:[{color:'B',x:4,y:4}], markers:[{x:4,y:3},{x:3,y:4},{x:5,y:4},{x:4,y:5}], auto:true, size:9, fb:{t:'Ortadaki siyah taşın 4 özgürlüğü var.',c:'info'} },
-      { text:`<p>Kenar noktasındaki taşın <strong>3 özgürlüğü</strong>, köşedekinin ise <strong>2 özgürlüğü</strong> vardır.</p><div class="highlight">Özgürlük azaldıkça taş tehlikeye girer. Köşe ve kenar taşları daha savunmasızdır.</div>`, board:[{color:'B',x:0,y:0},{color:'W',x:8,y:4}], markers:[{x:1,y:0},{x:0,y:1},{x:8,y:3},{x:7,y:4},{x:8,y:5}], auto:true, size:9, fb:{t:'Köşe: 2 özgürlük · Kenar: 3 özgürlük · Orta: 4 özgürlük',c:'info'} },
-      { text:`<p>Yatay veya dikey olarak birbirine bağlı taşlar <strong>grup</strong> oluşturur. Grubun özgürlüğü tüm taşlarının boş komşularının toplamıdır.</p>`, board:[{color:'B',x:3,y:4},{color:'B',x:4,y:4},{color:'B',x:5,y:4}], markers:[{x:3,y:3},{x:2,y:4},{x:3,y:5},{x:4,y:3},{x:4,y:5},{x:5,y:3},{x:6,y:4},{x:5,y:5}], auto:true, size:9, fb:{t:'Bu üç taş bir grup — birlikte 8 özgürlüğü var.',c:'info'} },
+    { id:'l2', title:'Nefes Noktaları (Liberty)', steps:[
+      { text:`<p>Her taşın komşu boş noktalarına <strong class="term">nefes noktası</strong> (liberty) denir.</p><p>Ortadaki bir taşın <strong>4 nefes noktası</strong> vardır (üst, alt, sol, sağ).</p>`, board:[{color:'B',x:4,y:4}], markers:[{x:4,y:3},{x:3,y:4},{x:5,y:4},{x:4,y:5}], auto:true, size:9, fb:{t:'Ortadaki siyah taşın 4 nefes noktası var.',c:'info'} },
+      { text:`<p>Kenar noktasındaki taşın <strong>3 nefes noktası</strong>, köşedekinin ise <strong>2 nefes noktası</strong> vardır.</p><div class="highlight">Nefes noktası azaldıkça taş tehlikeye girer. Köşe ve kenar taşları daha savunmasızdır.</div>`, board:[{color:'B',x:0,y:0},{color:'W',x:8,y:4}], markers:[{x:1,y:0},{x:0,y:1},{x:8,y:3},{x:7,y:4},{x:8,y:5}], auto:true, size:9, fb:{t:'Köşe: 2 nefes noktası · Kenar: 3 nefes noktası · Orta: 4 nefes noktası',c:'info'} },
+      { text:`<p>Yatay veya dikey olarak birbirine bağlı taşlar <strong>grup</strong> oluşturur. Grubun özgürlüğü tüm taşlarının boş komşularının toplamıdır.</p>`, board:[{color:'B',x:3,y:4},{color:'B',x:4,y:4},{color:'B',x:5,y:4}], markers:[{x:3,y:3},{x:2,y:4},{x:3,y:5},{x:4,y:3},{x:4,y:5},{x:5,y:3},{x:6,y:4},{x:5,y:5}], auto:true, size:9, fb:{t:'Bu üç taş bir grup — birlikte 8 nefes noktası var.',c:'info'} },
     ]},
 
     { id:'l3', title:'Taş Yakalama', steps:[
-      { text:`<p>Bir taşın <strong>tüm özgürlükleri doldurulursa</strong>, o taş yakalanır ve tahtadan kalkar.</p><p>Beyaz taşın tek boş noktası var — oraya siyah taş koyarak beyazı yakala! <strong>E6 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:3},{color:'B',x:5,y:4}], answer:{x:4,y:5}, turn:'black', size:9, fb:{t:'Beyaz taşın son özgürlüğüne tıkla!',c:'info'}, fb_ok:'Yakaladın! Beyaz taş tahtadan kalkar.', fb_err:'Beyaz taşın çevresindeki boş noktayı bul.', capture:[{x:4,y:4}] },
-      { text:`<p>Bir <strong>grubu</strong> yakalamak için grubun tüm özgürlüklerini doldurman gerekir.</p><p>İki beyaz taşın son özgürlüğünü doldur — <strong>D5 noktasına tıkla.</strong></p>`, board:[{color:'W',x:3,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:3},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:5,y:3},{color:'B',x:4,y:4}], answer:{x:3,y:4}, turn:'black', size:9, fb:{t:'İki beyaz taşın son boş noktasını bul.',c:'info'}, fb_ok:'Grubu yakaladın! İkisi birden kalkar.', fb_err:'Beyaz grubun son özgürlüğünü bul.', capture:[{x:3,y:3},{x:4,y:3}] },
+      { text:`<p>Bir taşın <strong>tüm nefes noktaları doldurulursa</strong>, o taş yakalanır ve tahtadan kalkar.</p><p>Beyaz taşın tek boş noktası var — oraya siyah taş koyarak beyazı yakala! <strong>E6 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:3},{color:'B',x:5,y:4}], answer:{x:4,y:5}, turn:'black', size:9, fb:{t:'Beyaz taşın son nefes noktasına tıkla!',c:'info'}, fb_ok:'Yakaladın! Beyaz taş tahtadan kalkar.', fb_err:'Beyaz taşın çevresindeki boş noktayı bul.', capture:[{x:4,y:4}] },
+      { text:`<p>Bir <strong>grubu</strong> yakalamak için grubun tüm nefes noktalarıni doldurman gerekir.</p><p>İki beyaz taşın son nefes noktasını doldur — <strong>D5 noktasına tıkla.</strong></p>`, board:[{color:'W',x:3,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:3},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:5,y:3},{color:'B',x:4,y:4}], answer:{x:3,y:4}, turn:'black', size:9, fb:{t:'İki beyaz taşın son boş noktasını bul.',c:'info'}, fb_ok:'Grubu yakaladın! İkisi birden kalkar.', fb_err:'Beyaz grubun son nefes noktasını bul.', capture:[{x:3,y:3},{x:4,y:3}] },
       { text:`<p>Bir örnek daha! Siyah taşlar beyaz grubu neredeyse tamamen sarmış.</p><p>Beyaz grubun <strong>tek özgürlüğü</strong> kaldı — oraya siyah taş koy ve grubu yakala.</p><p><strong>D5 noktasına tıkla.</strong></p>`,
         board:[
           {color:'W',x:4,y:4},{color:'W',x:4,y:5},
@@ -296,7 +296,7 @@ const CURRICULUM = [
         ],
         markers:[{x:3,y:4}],
         answer:{x:3,y:4}, turn:'black', size:9,
-        fb:{t:'Beyaz grubun son özgürlüğünü bul!',c:'info'},
+        fb:{t:'Beyaz grubun son nefes noktasını bul!',c:'info'},
         fb_ok:'Mükemmel! Beyaz iki taş birden yakalandı.',
         fb_err:'D5 noktasına tıkla — beyazın tek boş komşusu.',
         capture:[{x:4,y:4},{x:4,y:5}]
@@ -305,7 +305,7 @@ const CURRICULUM = [
     ]},
 
     { id:'l4', title:'Öz-Yakalama Yasak', steps:[
-      { text:`<p>Kendi taşını özgürlüksüz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Beyaz taşların sardığı orta noktaya siyah taş konamaaz — anında özgürlüksüz kalır.</p>`, board:[{color:'W',x:3,y:3},{color:'W',x:5,y:3},{color:'W',x:4,y:2},{color:'W',x:4,y:4}], auto:true, size:9, fb:{t:'E4 noktasına taş koymak yasak — öz-yakalama!',c:'info'} },
+      { text:`<p>Kendi taşını nefessiz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Beyaz taşların sardığı orta noktaya siyah taş konamaaz — anında nefessiz kalır.</p>`, board:[{color:'W',x:3,y:3},{color:'W',x:5,y:3},{color:'W',x:4,y:2},{color:'W',x:4,y:4}], auto:true, size:9, fb:{t:'E4 noktasına taş koymak yasak — öz-yakalama!',c:'info'} },
       { text:`<p><strong>İstisna:</strong> O noktaya koyduğunda rakip taşı <em>yakalıyorsan</em> hamle geçerlidir. Yakalama, öz-yakalama yasağından önce gelir.</p><p>Beyazı yakala — <strong>E5 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:3},{color:'B',x:3,y:3},{color:'B',x:5,y:3},{color:'B',x:4,y:2}], answer:{x:4,y:4}, turn:'black', size:9, fb:{t:'Beyazı yakalayan hamle geçerli!',c:'info'}, fb_ok:'Doğru! Yakalama hamlesi öz-yakalama sayılmaz.', fb_err:'Beyaz taşın altındaki noktayı bul.', capture:[{x:4,y:3}] },
     ]},
 
@@ -335,7 +335,7 @@ const CURRICULUM = [
     ]},
 
     { id:'l9', title:'Çift Atari', steps:[
-      { text:`<p><span class="term">Atari</span> — bir taşın son özgürlüğü tehdit altında. <span class="term">Çift atari</span> ise tek hamleyle iki farklı grubu aynı anda tehdit etmek.</p><p>Rakip ikisini birden kurtaramaz!</p>`, board:[{color:'W',x:2,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:2},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:1,y:3},{color:'B',x:2,y:4},{color:'B',x:4,y:4}], auto:true, size:9, fb:{t:'Doğru hamleyle iki beyaz gruba aynı anda atari yapılabilir.',c:'info'} },
+      { text:`<p><span class="term">Atari</span> — bir taşın son nefes noktası tehdit altında. <span class="term">Çift atari</span> ise tek hamleyle iki farklı grubu aynı anda tehdit etmek.</p><p>Rakip ikisini birden kurtaramaz!</p>`, board:[{color:'W',x:2,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:2},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:1,y:3},{color:'B',x:2,y:4},{color:'B',x:4,y:4}], auto:true, size:9, fb:{t:'Doğru hamleyle iki beyaz gruba aynı anda atari yapılabilir.',c:'info'} },
       { text:`<p>Çift atari hamlesini bul! <strong>D4 noktasına tıkla.</strong></p>`, board:[{color:'W',x:2,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:2},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:1,y:3},{color:'B',x:2,y:4},{color:'B',x:4,y:4}], answer:{x:3,y:3}, turn:'black', size:9, fb:{t:'Tek hamleyle iki grubu tehdit et!',c:'info'}, fb_ok:'Mükemmel çift atari! Beyaz ikisini birden kurtaramaz.', fb_err:'Her iki beyaz gruba da atari yapacak noktayı bul.' },
     ]},
 
@@ -423,7 +423,7 @@ function drawBoard(){
   for(let i=0;i<boardSize;i++){const px=m+i*st;ctx.fillText(LTRS[i],px,m*.38);ctx.fillText(LTRS[i],px,s-m*.38);ctx.fillText(String(boardSize-i),m*.38,m+i*st);ctx.fillText(String(boardSize-i),s-m*.38,m+i*st);}
   for(let y=0;y<boardSize;y++)for(let x=0;x<boardSize;x++)if(boardGrid[y][x])drawStone(ctx,m+x*st,m+y*st,st*.46,boardGrid[y][x]);
 
-  // Özgürlük işaretleri (kırmızı çarpı)
+  // Nefes noktası işaretleri (kırmızı çarpı)
   const step = CUR_LESSON?.steps[CUR_STEP];
   if(step?.markers){
     step.markers.forEach(mk=>{
