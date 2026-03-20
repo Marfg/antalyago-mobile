@@ -631,6 +631,35 @@ function drawKoPoint({x, y, color}) {
   ctx.restore();
 }
 
+/* Bölge işaretçileri — yanıp sönen çarpı (siyah/beyaz bölge) */
+function drawTerritory(points, side) {
+  const col = side === 'black' ? '#1a1a2e' : '#f5f0e8';
+  const Y   = -BOARD_H/2 - .3;
+  const ARM = CELL * 0.22;
+  const pulse = .45 + .55*Math.sin(hlTime*2.5);
+
+  points.forEach(({x, y}) => {
+    const wx = -HALF + x*CELL;
+    const wz = -HALF + y*CELL;
+    const p  = project(wx, Y, wz);
+    if(p.scale < 0.15) return;
+
+    const pL = project(wx-ARM, Y, wz);
+    const pR = project(wx+ARM, Y, wz);
+    const pU = project(wx, Y, wz-ARM);
+    const pD = project(wx, Y, wz+ARM);
+
+    ctx.save();
+    ctx.globalAlpha = 0.80 * pulse;
+    ctx.strokeStyle = col;
+    ctx.lineWidth   = Math.max(1, 1.8 * p.scale);
+    ctx.lineCap     = 'round';
+    ctx.beginPath(); ctx.moveTo(pL.sx, pL.sy); ctx.lineTo(pR.sx, pR.sy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pU.sx, pU.sy); ctx.lineTo(pD.sx, pD.sy); ctx.stroke();
+    ctx.restore();
+  });
+}
+
 /* Highlight rings — target intersections */
 let hlTime = 0;
 function drawHighlights(step) {
@@ -744,6 +773,8 @@ function render() {
   if(CUR_STEP_DATA && !CUR_STEP_DATA.auto) drawHighlights(CUR_STEP_DATA);
   if(CUR_STEP_DATA) drawLiberties(CUR_STEP_DATA);
   if(koPoint) drawKoPoint(koPoint);
+  if(CUR_STEP_DATA?.blackTerritory?.length) drawTerritory(CUR_STEP_DATA.blackTerritory, 'black');
+  if(CUR_STEP_DATA?.whiteTerritory?.length) drawTerritory(CUR_STEP_DATA.whiteTerritory, 'white');
 
   /* Yasak hamle işaretleri */
   if(CUR_STEP_DATA && CUR_STEP_DATA.forbidden) {
@@ -933,7 +964,7 @@ const CURRICULUM = [
     ]},
 
     { id:'l6', title:'Oyun Sonu ve Sayım', steps:[
-      { text:`<p>Her iki oyuncu da art arda <strong>pas geçince</strong> oyun biter.</p><p>Kazanan, <strong>daha fazla bölge</strong> çeviren oyuncudur. Bölge = etrafı sarılmış boş noktalar.</p>`, board:[{color:'B',x:1,y:1},{color:'B',x:2,y:1},{color:'B',x:3,y:1},{color:'B',x:1,y:2},{color:'B',x:3,y:2},{color:'B',x:1,y:3},{color:'B',x:2,y:3},{color:'B',x:3,y:3},{color:'W',x:5,y:5},{color:'W',x:6,y:5},{color:'W',x:7,y:5},{color:'W',x:5,y:6},{color:'W',x:7,y:6},{color:'W',x:5,y:7},{color:'W',x:6,y:7},{color:'W',x:7,y:7}], auto:true, size:9, camera:CAM.high, fb:{t:'Siyah sol üstte, Beyaz sağ altta bölge sardı.',c:'info'} },
+      { text:`<p>Her iki oyuncu da art arda <strong>pas geçince</strong> oyun biter.</p><p>Kazanan, <strong>daha fazla bölge</strong> çeviren oyuncudur. Bölge = etrafı sarılmış boş noktalar.</p>`, board:[{color:'W',x:3,y:0},{color:'W',x:3,y:1},{color:'W',x:2,y:2},{color:'W',x:3,y:2},{color:'W',x:5,y:2},{color:'W',x:1,y:3},{color:'W',x:3,y:3},{color:'W',x:4,y:3},{color:'W',x:5,y:3},{color:'W',x:6,y:3},{color:'W',x:1,y:4},{color:'W',x:4,y:4},{color:'W',x:6,y:4},{color:'W',x:2,y:5},{color:'W',x:2,y:6},{color:'W',x:3,y:6},{color:'W',x:3,y:7},{color:'W',x:3,y:8},{color:'W',x:4,y:8},{color:'B',x:4,y:0},{color:'B',x:4,y:1},{color:'B',x:5,y:1},{color:'B',x:7,y:1},{color:'B',x:4,y:2},{color:'B',x:6,y:2},{color:'B',x:2,y:3},{color:'B',x:7,y:3},{color:'B',x:2,y:4},{color:'B',x:3,y:4},{color:'B',x:5,y:4},{color:'B',x:7,y:4},{color:'B',x:3,y:5},{color:'B',x:4,y:5},{color:'B',x:5,y:5},{color:'B',x:6,y:5},{color:'B',x:4,y:6},{color:'B',x:4,y:7},{color:'B',x:6,y:7},{color:'B',x:5,y:8}], blackTerritory:[{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:0,y:1},{x:1,y:1},{x:2,y:1},{x:0,y:2},{x:1,y:2},{x:0,y:3},{x:0,y:4},{x:0,y:5},{x:1,y:5},{x:0,y:6},{x:1,y:6},{x:0,y:7},{x:1,y:7},{x:2,y:7},{x:0,y:8},{x:1,y:8},{x:2,y:8}], whiteTerritory:[{x:5,y:0},{x:6,y:0},{x:7,y:0},{x:8,y:0},{x:6,y:1},{x:8,y:1},{x:7,y:2},{x:8,y:2},{x:8,y:3},{x:8,y:4},{x:7,y:5},{x:8,y:5},{x:5,y:6},{x:6,y:6},{x:7,y:6},{x:8,y:6},{x:5,y:7},{x:7,y:7},{x:8,y:7},{x:6,y:8},{x:7,y:8},{x:8,y:8}], auto:true, size:9, camera:CAM.high, fb:{t:'Siyah sol (20 puan) · Beyaz sağ (22 puan) — beyaz önde!',c:'info'} },
       { text:`<p>Puan hesabı: <strong>Bölge</strong> + <strong>Esirler</strong> + <strong>Komi</strong> (beyaza verilen avantaj, genellikle 6.5)</p><div class="highlight-box">Komi, siyahın ilk hamle avantajını dengeler.</div>`, board:[], auto:true, size:9, fb:{t:'Komi genellikle 6.5\'tir.',c:'info'} },
     ]},
   ]},
