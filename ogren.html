@@ -291,6 +291,12 @@ const CURRICULUM = [
       { text:`<p>Bir <strong>grubu</strong> yakalamak için grubun tüm nefes noktalarıni doldurman gerekir.</p><p>İki beyaz taşın son nefes noktasını doldur — <strong>D5 noktasına tıkla.</strong></p>`, board:[{color:'W',x:3,y:3},{color:'W',x:4,y:3},{color:'B',x:2,y:3},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:5,y:3},{color:'B',x:4,y:4}], answer:{x:3,y:4}, turn:'black', size:9, fb:{t:'İki beyaz taşın son boş noktasını bul.',c:'info'}, fb_ok:'Grubu yakaladın! İkisi birden kalkar.', fb_err:'Beyaz grubun son nefes noktasını bul.', capture:[{x:3,y:3},{x:4,y:3}] },
       { text:`<p>Bir örnek daha! <strong>3 taşlı beyaz grup</strong> siyahlarla çevrilmiş.</p><p>Beyaz grubun tek nefes noktasını bul ve grubu yakala — <strong>E6 noktasına tıkla.</strong></p>`,
         formation:'formations/b1-temel-kurallar/l3-tas-alma/adim-3.json',
+        board:[
+          {color:'B',x:4,y:1},{color:'B',x:5,y:1},{color:'B',x:3,y:2},
+          {color:'B',x:6,y:2},{color:'B',x:6,y:3},{color:'B',x:5,y:4},
+          {color:'W',x:4,y:2},{color:'W',x:5,y:2},{color:'W',x:5,y:3}
+        ],
+        answer:{x:4,y:3}, capture:[{x:4,y:2},{x:5,y:2},{x:5,y:3}],
         turn:'black', size:9,
         fb:{t:'3 taşlı beyaz grubun tek boş noktasını bul.',c:'info'},
         fb_ok:'Mükemmel! Üç beyaz taş birden yakalandı.',
@@ -300,8 +306,33 @@ const CURRICULUM = [
     ]},
 
     { id:'l4', title:'Yasak Hamleler', steps:[
-      { text:`<p>Kendi taşını nefessiz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Tahtada dört farklı bölgede yasak nokta işaretli. Her biri çevresi beyaz taşlarla sarılmış — oraya siyah taş konulamaz.</p>`, formation:'formations/b1-temel-kurallar/l4-yasak-hamleler/adim-1.json', auto:true, size:9, fb:{t:'İşaretli dört nokta öz-yakalama yasağından dolayı yasak.',c:'info'} },
-      { text:`<p><strong>İstisna:</strong> O noktaya koyduğunda rakip taşı <em>yakalıyorsan</em> hamle geçerlidir. Yakalama, öz-yakalama yasağından önce gelir.</p><p>Aşağıda iki örnek izle — siyah üstte 5 beyazı alıyor, beyaz altta 5 siyahı alıyor.</p>`, formation:'formations/b1-temel-kurallar/l4-yasak-hamleler/adim-2.json', auto:true, size:9, fb:{t:'Yakalama hamlesi öz-yakalama sayılmaz — her iki renkten örnek.',c:'info'} },
+      { text:`<p>Kendi taşını nefessiz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Tahtada dört farklı bölgede yasak nokta işaretli. Her biri çevresi beyaz taşlarla sarılmış — oraya siyah taş konulamaz.</p>`,
+        formation:'formations/b1-temel-kurallar/l4-yasak-hamleler/adim-1.json',
+        board:[
+          {color:'W',x:4,y:0},{color:'W',x:6,y:0},
+          {color:'W',x:4,y:1},{color:'W',x:5,y:1},{color:'W',x:6,y:1},
+          {color:'W',x:0,y:3},{color:'W',x:1,y:4},{color:'W',x:4,y:4},
+          {color:'W',x:0,y:5},{color:'W',x:3,y:5},{color:'W',x:5,y:5},
+          {color:'W',x:4,y:6},{color:'W',x:8,y:7},{color:'W',x:7,y:8}
+        ],
+        forbidden:[{x:5,y:0},{x:0,y:4},{x:4,y:5},{x:8,y:8}],
+        auto:true, size:9, fb:{t:'İşaretli dört nokta öz-yakalama yasağından dolayı yasak.',c:'info'} },
+      { text:`<p><strong>İstisna:</strong> O noktaya koyduğunda rakip taşı <em>yakalıyorsan</em> hamle geçerlidir. Yakalama, öz-yakalama yasağından önce gelir.</p><p>Aşağıda iki örnek izle — siyah üstte 5 beyazı alıyor, beyaz altta 5 siyahı alıyor.</p>`,
+        formation:'formations/b1-temel-kurallar/l4-yasak-hamleler/adim-2.json',
+        board:[
+          {color:'W',x:3,y:0},{color:'W',x:5,y:0},{color:'W',x:3,y:1},{color:'W',x:4,y:1},{color:'W',x:5,y:1},
+          {color:'W',x:3,y:6},{color:'W',x:4,y:6},{color:'W',x:5,y:6},
+          {color:'W',x:2,y:7},{color:'W',x:6,y:7},{color:'W',x:2,y:8},{color:'W',x:6,y:8},
+          {color:'B',x:2,y:0},{color:'B',x:6,y:0},{color:'B',x:2,y:1},{color:'B',x:6,y:1},
+          {color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:5,y:2},
+          {color:'B',x:3,y:7},{color:'B',x:4,y:7},{color:'B',x:5,y:7},
+          {color:'B',x:3,y:8},{color:'B',x:5,y:8}
+        ],
+        moves:[
+          {color:'B',x:4,y:0,capture:[{x:3,y:0},{x:5,y:0},{x:3,y:1},{x:4,y:1},{x:5,y:1}]},
+          {color:'W',x:4,y:8,capture:[{x:3,y:7},{x:4,y:7},{x:5,y:7},{x:3,y:8},{x:5,y:8}]}
+        ],
+        auto:true, size:9, fb:{t:'Yakalama hamlesi öz-yakalama sayılmaz — her iki renkten örnek.',c:'info'} },
     ]},
 
     { id:'l5', title:'Ko Kuralı', steps:[
