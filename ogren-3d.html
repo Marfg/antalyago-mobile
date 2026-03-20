@@ -475,6 +475,75 @@ function drawGrid() {
   }
 }
 
+/* Liberty crosses — nefes noktaları görselleştirme */
+function drawLiberties(step) {
+  if(!step || !step.showLiberties) return;
+  const board = step.board || [];
+  const sz    = step.size  || SIZE;
+  // Build occupancy map from step board
+  const occ = Array.from({length:sz}, ()=>Array(sz).fill(null));
+  board.forEach(s=>{ if(s.x>=0&&s.x<sz&&s.y>=0&&s.y<sz) occ[s.y][s.x]=s.color; });
+
+  // Collect unique liberty points adjacent to black stones
+  const dirs = [{dx:1,dz:0},{dx:-1,dz:0},{dx:0,dz:1},{dx:0,dz:-1}];
+  const seen  = new Set();
+  const libs  = [];
+  board.forEach(s=>{
+    if(s.color!=='B') return;
+    dirs.forEach(({dx,dz})=>{
+      const nx=s.x+dx, nz=s.y+dz;
+      if(nx<0||nz<0||nx>=sz||nz>=sz) return;
+      if(occ[nz][nx]) return;
+      const key=`${nx},${nz}`;
+      if(!seen.has(key)){ seen.add(key); libs.push({x:nx,z:nz}); }
+    });
+  });
+  if(!libs.length) return;
+
+  const Y   = -BOARD_H/2 - .3;
+  const ARM = CELL * 0.30;                 // çarpı kol uzunluğu
+  const pulse = .6 + .4*Math.sin(hlTime*2.8);
+
+  libs.forEach(({x,z})=>{
+    const wx = -HALF + x*CELL;
+    const wz = -HALF + z*CELL;
+    const p  = project(wx, Y, wz);
+    if(p.scale < 0.15) return;
+
+    // 4 uç nokta (board yüzeyinde)
+    const pL = project(wx-ARM, Y, wz);
+    const pR = project(wx+ARM, Y, wz);
+    const pU = project(wx, Y, wz-ARM);
+    const pD = project(wx, Y, wz+ARM);
+
+    ctx.save();
+    ctx.globalAlpha = 0.82 * pulse;
+    ctx.strokeStyle = '#7ec8e3';
+    ctx.lineWidth   = Math.max(1, 2.2 * p.scale);
+    ctx.lineCap     = 'round';
+
+    // Yatay kol
+    ctx.beginPath();
+    ctx.moveTo(pL.sx, pL.sy);
+    ctx.lineTo(pR.sx, pR.sy);
+    ctx.stroke();
+
+    // Dikey kol
+    ctx.beginPath();
+    ctx.moveTo(pU.sx, pU.sy);
+    ctx.lineTo(pD.sx, pD.sy);
+    ctx.stroke();
+
+    // Merkez nokta
+    ctx.beginPath();
+    ctx.arc(p.sx, p.sy, 2.5*p.scale, 0, Math.PI*2);
+    ctx.fillStyle = '#7ec8e3';
+    ctx.fill();
+
+    ctx.restore();
+  });
+}
+
 /* Highlight rings — target intersections */
 let hlTime = 0;
 function drawHighlights(step) {
@@ -586,6 +655,7 @@ function render() {
   drawBoard(); drawGrid();
 
   if(CUR_STEP_DATA && !CUR_STEP_DATA.auto) drawHighlights(CUR_STEP_DATA);
+  if(CUR_STEP_DATA) drawLiberties(CUR_STEP_DATA);
 
   if(ghostActive&&ghostGrid){
     const {gx,gz}=ghostGrid;
@@ -685,9 +755,9 @@ const CURRICULUM = [
     ]},
 
     { id:'l2', title:'Nefes Noktaları', steps:[
-      { text:`<p>Her taşın komşu boş noktalarına <strong><span class="term">nefes noktası</span></strong> denir.</p><p>Ortadaki bir taşın <strong>4 nefes noktası</strong> vardır (üst, alt, sol, sağ).</p>`, board:[{color:'B',x:4,y:4}], auto:true, size:9, camera:CAM.center, fb:{t:'Ortadaki siyah taşın 4 nefes noktası var.',c:'info'} },
-      { text:`<p>Kenar noktasındaki taşın <strong>3 nefes noktası</strong>, köşedekinin ise <strong>2 nefes noktası</strong> vardır.</p><div class="highlight-box">Nefes noktası azaldıkça taş tehlikeye girer. Köşe ve kenar taşları daha savunmasızdır.</div>`, board:[{color:'B',x:0,y:0},{color:'W',x:8,y:4}], auto:true, size:9, fb:{t:'Köşe: 2 · Kenar: 3 · Orta: 4 nefes noktası',c:'info'} },
-      { text:`<p>Yatay veya dikey olarak birbirine bağlı taşlar <strong>grup</strong> oluşturur. Grubun özgürlüğü tüm taşlarının boş komşularının toplamıdır.</p>`, board:[{color:'B',x:3,y:4},{color:'B',x:4,y:4},{color:'B',x:5,y:4}], auto:true, size:9, fb:{t:'Bu üç taş bir grup — birlikte 8 nefes noktası var.',c:'info'} },
+      { text:`<p>Her taşın komşu boş noktalarına <strong><span class="term">nefes noktası</span></strong> denir.</p><p>Ortadaki bir taşın <strong>4 nefes noktası</strong> vardır (üst, alt, sol, sağ).</p>`, board:[{color:'B',x:4,y:4}], auto:true, showLiberties:true, size:9, camera:CAM.center, fb:{t:'Ortadaki siyah taşın 4 nefes noktası var.',c:'info'} },
+      { text:`<p>Kenar noktasındaki taşın <strong>3 nefes noktası</strong>, köşedekinin ise <strong>2 nefes noktası</strong> vardır.</p><div class="highlight-box">Nefes noktası azaldıkça taş tehlikeye girer. Köşe ve kenar taşları daha savunmasızdır.</div>`, board:[{color:'B',x:0,y:0},{color:'W',x:8,y:4}], auto:true, showLiberties:true, size:9, fb:{t:'Köşe: 2 · Kenar: 3 · Orta: 4 nefes noktası',c:'info'} },
+      { text:`<p>Yatay veya dikey olarak birbirine bağlı taşlar <strong>grup</strong> oluşturur. Grubun özgürlüğü tüm taşlarının boş komşularının toplamıdır.</p>`, board:[{color:'B',x:3,y:4},{color:'B',x:4,y:4},{color:'B',x:5,y:4}], auto:true, showLiberties:true, size:9, fb:{t:'Bu üç taş bir grup — birlikte 8 nefes noktası var.',c:'info'} },
     ]},
 
     { id:'l3', title:'Taş Alma', steps:[
