@@ -727,9 +727,6 @@ function render() {
       if(r < 4) return;
       const ry = r * Math.sqrt(Math.sin(camPitch)**2 + ASPECT_3D**2 * Math.cos(camPitch)**2);
       ctx.save();
-      /* kırmızı daire */
-      ctx.beginPath(); ctx.ellipse(p.sx,p.sy,r,ry,0,0,Math.PI*2);
-      ctx.strokeStyle='rgba(220,60,60,.80)'; ctx.lineWidth=Math.max(1.5,2.5*p.scale); ctx.stroke();
       /* X çizgileri — board yüzeyinde yatay+dikey */
       const arm = r * .62;
       const pL=project(wx-arm*.9,Y,wz-arm*.9), pR=project(wx+arm*.9,Y,wz+arm*.9);
