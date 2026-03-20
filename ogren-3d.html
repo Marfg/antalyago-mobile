@@ -207,6 +207,23 @@
       text-transform: uppercase; pointer-events: none;
     }
 
+    /* ── BOARD PICKER ── */
+    #board-picker { display: none; flex-direction: column; gap: .55rem; }
+    #board-picker.show { display: flex; }
+    .bp-label { font-size: .68rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--gold); }
+    .bp-options { display: flex; gap: .5rem; }
+    .bp-btn {
+      flex: 1; padding: .55rem .3rem; border: 1px solid var(--gborder); border-radius: 7px;
+      background: transparent; color: var(--muted); font-size: .72rem; font-weight: 600;
+      cursor: pointer; text-align: center; transition: all .15s;
+      font-family: 'Noto Sans', sans-serif; line-height: 1.5;
+    }
+    .bp-btn:hover { border-color: var(--gold); color: var(--text); background: rgba(200,168,75,.07); }
+    .bp-btn.active { background: rgba(200,168,75,.15); border-color: var(--gold); color: var(--gold); }
+    .bp-btn .bp-sub { display: block; font-size: .6rem; font-weight: 400; color: inherit; opacity: .7; }
+    .bp-desc { font-size: .74rem; color: var(--muted); line-height: 1.6; padding: .3rem .5rem;
+      background: rgba(200,168,75,.05); border-radius: 4px; border-left: 2px solid var(--gborder); }
+
     @media (max-width: 768px) {
       #sidebar  { display: none; }
       #sb-toggle { display: none; }
@@ -259,6 +276,17 @@
   <div id="lesson-title">Ders Seç</div>
   <div class="step-dots" id="step-dots"></div>
   <div id="lesson-body"><p>Sol panelden bir ders seçin.</p></div>
+  <!-- Board size picker (Tahta ve Taşlar dersi) -->
+  <div id="board-picker">
+    <div class="bp-label">Tahta Boyutu</div>
+    <div class="bp-options">
+      <button class="bp-btn active" onclick="setBoardSize(9)">9×9<span class="bp-sub">Başlangıç</span></button>
+      <button class="bp-btn" onclick="setBoardSize(13)">13×13<span class="bp-sub">Orta</span></button>
+      <button class="bp-btn" onclick="setBoardSize(19)">19×19<span class="bp-sub">Standart</span></button>
+    </div>
+    <div class="bp-desc" id="bp-desc">Yeni başlayanlar için 9×9 tahtasıyla başlamak önerilir.</div>
+  </div>
+
   <div id="feedback" class="info">
     <span class="fb-icon">💡</span>
     <span id="fb-text">Bir ders seçin.</span>
@@ -301,7 +329,8 @@ function project(x, y, z) {
   return { sx: W/2 + rx*sc, sy: H/2 + ry2*sc, scale: sc, z: rz2 };
 }
 
-const SIZE = 9, CELL = 48, HALF = (SIZE-1)*CELL/2, BOARD_H = 14;
+let SIZE = 9, CELL = 48, HALF = (SIZE-1)*CELL/2;
+const BOARD_H = 14;
 const STONE_R = 20, ASPECT_3D = 0.36, ANIM_DUR = 0.20;
 
 function stoneRadii(p, mul) {
@@ -460,18 +489,24 @@ function drawGrid() {
     const a=project(p,Y,-HALF),b=project(p,Y,HALF); ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke();
     const c=project(-HALF,Y,p),d=project(HALF,Y,p); ctx.beginPath(); ctx.moveTo(c.sx,c.sy); ctx.lineTo(d.sx,d.sy); ctx.stroke();
   }
-  [[2,2],[6,2],[4,4],[2,6],[6,6]].forEach(([sx,sz])=>{
+  const HOSHI = SIZE===19
+    ? [[3,3],[9,3],[15,3],[3,9],[9,9],[15,9],[3,15],[9,15],[15,15]]
+    : SIZE===13
+    ? [[3,3],[9,3],[6,6],[3,9],[9,9]]
+    : [[2,2],[6,2],[4,4],[2,6],[6,6]];
+  HOSHI.forEach(([sx,sz])=>{
     const p=project(-HALF+sx*CELL,Y,-HALF+sz*CELL);
     ctx.beginPath(); ctx.arc(p.sx,p.sy,3.8*p.scale,0,Math.PI*2);
     ctx.fillStyle='rgba(48,20,0,.88)'; ctx.fill();
   });
+  const LTRS_ALL='ABCDEFGHJKLMNOPQRST';
   ctx.textAlign='center'; ctx.textBaseline='middle';
   for(let i=0;i<SIZE;i++){
     const pos=-HALF+i*CELL;
     const lb=project(pos,Y,HALF+CELL*.72), nl=project(-HALF-CELL*.72,Y,pos);
     const fs=Math.round(9*lb.scale); if(fs<6) continue;
     ctx.font=`bold ${fs}px monospace`; ctx.fillStyle='rgba(75,36,6,.78)';
-    ctx.fillText(LTRS[i],lb.sx,lb.sy); ctx.fillText(String(SIZE-i),nl.sx,nl.sy);
+    ctx.fillText(LTRS_ALL[i],lb.sx,lb.sy); ctx.fillText(String(SIZE-i),nl.sx,nl.sy);
   }
 }
 
@@ -728,6 +763,22 @@ canvas.addEventListener('wheel',e=>{
   camDist=Math.max(180,Math.min(960,camDist+e.deltaY*.5));
 },{passive:true});
 
+const BP_DESCS = {
+  9:  'Yeni başlayanlar için idealdir. Oyun hızlı biter, temel kavramlar net görünür.',
+  13: 'Orta seviye oyuncular için. Strateji gelişmeye başlar, oyun daha uzun sürer.',
+  19: 'Profesyonel standart tahta. Tam strateji derinliği ve uzun oyunlar için.',
+};
+window.setBoardSize = function(n) {
+  SIZE = n;
+  CELL = n===9 ? 48 : n===13 ? 32 : 22;
+  HALF = (SIZE-1)*CELL/2;
+  game.reset();
+  document.querySelectorAll('.bp-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.bp-btn').forEach(b=>{ if(b.textContent.startsWith(n+'×')) b.classList.add('active'); });
+  document.getElementById('bp-desc').textContent = BP_DESCS[n];
+  animateCamera(CAM.overview);
+};
+
 function toggleRotate() {
   rotateMode = !rotateMode;
   const btn=document.getElementById('rotate-toggle');
@@ -749,7 +800,7 @@ const CURRICULUM = [
   { id:'c1', title:'Temel Kurallar', lessons:[
 
     { id:'l1', title:'Tahta ve Taşlar', steps:[
-      { text:`<p>Go, <strong>19×19'luk</strong> bir tahta üzerinde oynanan iki kişilik bir strateji oyunudur. Yeni başlayanlar için <strong>9×9</strong> daha uygundur.</p><p>İki oyuncu vardır: biri <strong>siyah</strong>, diğeri <strong>beyaz</strong>. <em>Siyah her zaman önce oynar.</em></p>`, board:[], auto:true, size:9, camera:CAM.overview, fb:{t:'Taşlar çizgilerin kesişim noktalarına yerleştirilir.',c:'info'} },
+      { text:`<p>Go, <strong>19×19'luk</strong> bir tahta üzerinde oynanan iki kişilik bir strateji oyunudur. Yeni başlayanlar için <strong>9×9</strong> daha uygundur.</p><p>İki oyuncu vardır: biri <strong>siyah</strong>, diğeri <strong>beyaz</strong>. <em>Siyah her zaman önce oynar.</em></p>`, board:[], auto:true, boardSelector:true, size:9, camera:CAM.overview, fb:{t:'Tahta boyutunu seçerek farkı inceleyin.',c:'info'} },
       { text:`<p>Taşlar karelerin içine değil, <strong>çizgilerin kesişim noktalarına</strong> yerleştirilir.</p><p>Aşağıdaki tahtaya herhangi bir noktaya tıklayarak <strong>siyah taş koy.</strong></p>`, board:[], answers:'any', turn:'black', size:9, fb:{t:'Herhangi bir noktaya tıkla!',c:'info'}, fb_ok:'Mükemmel! Taşı doğru noktaya koydun.' },
       { text:`<p>Taşlar bir kez konulduktan sonra <strong>hareket ettirilemez</strong> — sadece yakalanarak kaldırılabilir.</p><div class="highlight-box">Go'da taşlar hareket etmez, sadece eklenir veya kaldırılır.</div>`, board:[{color:'W',x:4,y:4}], auto:true, size:9, fb:{t:'Bu beyaz taş artık o noktada sabit.',c:'info'} },
     ]},
@@ -870,6 +921,9 @@ function loadStep(idx) {
 
   /* Feedback */
   setFb(step.fb?.t||'Tahtayı inceleyin.', step.fb?.c||'info');
+
+  /* Board picker visibility */
+  document.getElementById('board-picker').classList.toggle('show', !!step.boardSelector);
 
   /* Mode */
   if(step.auto) {
