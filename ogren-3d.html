@@ -957,7 +957,8 @@ function loadStep(idx) {
   /* Feedback */
   setFb(step.fb?.t||'Tahtayı inceleyin.', step.fb?.c||'info');
 
-  /* Board picker visibility */
+  /* Board picker visibility — boyutu her adımda 9x9'a sıfırla */
+  if(!step.boardSelector && SIZE !== 9) { SIZE=9; CELL=48; HALF=(SIZE-1)*CELL/2; }
   document.getElementById('board-picker').classList.toggle('show', !!step.boardSelector);
 
   /* Mode */
