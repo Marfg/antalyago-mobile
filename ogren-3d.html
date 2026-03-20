@@ -716,11 +716,54 @@ function render() {
   if(CUR_STEP_DATA && !CUR_STEP_DATA.auto) drawHighlights(CUR_STEP_DATA);
   if(CUR_STEP_DATA) drawLiberties(CUR_STEP_DATA);
 
+  /* Yasak hamle işaretleri */
+  if(CUR_STEP_DATA && CUR_STEP_DATA.forbidden) {
+    const Y = -BOARD_H/2 - .3;
+    const sp = Math.abs(Math.sin(camPitch));
+    CUR_STEP_DATA.forbidden.forEach(({x,y})=>{
+      const wx=-HALF+x*CELL, wz=-HALF+y*CELL;
+      const p = project(wx, Y, wz);
+      const r = STONE_R * p.scale * 1.1;
+      if(r < 4) return;
+      const ry = r * Math.sqrt(Math.sin(camPitch)**2 + ASPECT_3D**2 * Math.cos(camPitch)**2);
+      ctx.save();
+      /* kırmızı daire */
+      ctx.beginPath(); ctx.ellipse(p.sx,p.sy,r,ry,0,0,Math.PI*2);
+      ctx.strokeStyle='rgba(220,60,60,.80)'; ctx.lineWidth=Math.max(1.5,2.5*p.scale); ctx.stroke();
+      /* X çizgileri — board yüzeyinde yatay+dikey */
+      const arm = r * .62;
+      const pL=project(wx-arm*.9,Y,wz-arm*.9), pR=project(wx+arm*.9,Y,wz+arm*.9);
+      const pU=project(wx+arm*.9,Y,wz-arm*.9), pD=project(wx-arm*.9,Y,wz+arm*.9);
+      ctx.strokeStyle='rgba(220,60,60,.80)'; ctx.lineWidth=Math.max(1.5,2.2*p.scale); ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(pL.sx,pL.sy); ctx.lineTo(pR.sx,pR.sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pU.sx,pU.sy); ctx.lineTo(pD.sx,pD.sy); ctx.stroke();
+      ctx.restore();
+    });
+  }
+
   if(ghostActive&&ghostGrid){
     const {gx,gz}=ghostGrid;
     if(!game.grid[gz][gx]){
       const wy=-(BOARD_H/2)-STONE_R*ASPECT_3D-1;
-      drawStone(-HALF+gx*CELL,wy,-HALF+gz*CELL,game.turn,.26,1);
+      const step=CUR_STEP_DATA;
+      /* Doğru hamle mi? */
+      const isCorrect = step && (
+        (step.answer && step.answer.x===gx && step.answer.y===gz) ||
+        (Array.isArray(step.answers) && step.answers.some(a=>a.x===gx&&a.y===gz)) ||
+        step.answers==='any'
+      );
+      if(isCorrect) {
+        /* Belirgin ghost + pulsing yeşil halka */
+        drawStone(-HALF+gx*CELL,wy,-HALF+gz*CELL,game.turn,.60,1);
+        const Y=-BOARD_H/2-.3, sp=Math.abs(Math.sin(camPitch));
+        const p=project(-HALF+gx*CELL,Y,-HALF+gz*CELL);
+        const rx=STONE_R*p.scale*1.45, ry2=rx*sp;
+        const pulse=.55+.45*Math.sin(hlTime*4);
+        ctx.beginPath(); ctx.ellipse(p.sx,p.sy,rx,ry2,0,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(62,207,128,${.70*pulse})`; ctx.lineWidth=2*p.scale; ctx.stroke();
+      } else {
+        drawStone(-HALF+gx*CELL,wy,-HALF+gz*CELL,game.turn,.22,1);
+      }
     }
   }
 
@@ -853,7 +896,7 @@ const CURRICULUM = [
     ]},
 
     { id:'l4', title:'Yasak Hamleler', steps:[
-      { text:`<p>Kendi taşını nefessiz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Beyaz taşların sardığı orta noktaya siyah taş konamaz — anında nefessiz kalır.</p>`, board:[{color:'W',x:3,y:3},{color:'W',x:5,y:3},{color:'W',x:4,y:2},{color:'W',x:4,y:4}], auto:true, size:9, camera:CAM.center, fb:{t:'E4 noktasına taş koymak yasak — öz-yakalama!',c:'info'} },
+      { text:`<p>Kendi taşını nefessiz bırakacak bir hamle <strong>yapamazsın</strong> — bu <span class="term">öz-yakalama</span> yasağıdır.</p><p>Beyaz taşların sardığı orta noktaya siyah taş konamaz — anında nefessiz kalır.</p>`, board:[{color:'W',x:3,y:3},{color:'W',x:5,y:3},{color:'W',x:4,y:2},{color:'W',x:4,y:4}], auto:true, forbidden:[{x:4,y:3}], size:9, camera:CAM.center, fb:{t:'E4 noktasına taş koymak yasak — öz-yakalama!',c:'info'} },
       { text:`<p><strong>İstisna:</strong> O noktaya koyduğunda rakip taşı <em>yakalıyorsan</em> hamle geçerlidir.</p><p>Beyazı yakala — <strong>E5 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:3},{color:'B',x:3,y:3},{color:'B',x:5,y:3},{color:'B',x:4,y:2}], answer:{x:4,y:4}, turn:'black', size:9, fb:{t:'Beyazı yakalayan hamle geçerli!',c:'info'}, fb_ok:'Doğru! Yakalama hamlesi öz-yakalama sayılmaz.', fb_err:'Beyaz taşın altındaki noktayı bul.', capture:[{x:4,y:3}] },
     ]},
 
