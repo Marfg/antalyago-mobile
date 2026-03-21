@@ -817,6 +817,29 @@ function drawGroupIndicators(step) {
   });
 }
 
+function drawNextMoveHint() {
+  if(!nextMoveHint) return;
+  const Y     = -BOARD_H/2 - .3;
+  const ARM   = CELL * 0.30;
+  const pulse = .6 + .4*Math.sin(hlTime*2.8);
+  const wx    = -HALF + nextMoveHint.x*CELL;
+  const wz    = -HALF + nextMoveHint.y*CELL;
+  const p     = project(wx, Y, wz);
+  if(p.scale < 0.15) return;
+  const pL = project(wx-ARM, Y, wz),   pR = project(wx+ARM, Y, wz);
+  const pU = project(wx,     Y, wz-ARM), pD = project(wx,   Y, wz+ARM);
+  ctx.save();
+  ctx.globalAlpha = 0.82 * pulse;
+  ctx.strokeStyle = '#3ec878';
+  ctx.lineWidth   = Math.max(1, 2.2 * p.scale);
+  ctx.lineCap     = 'round';
+  ctx.beginPath(); ctx.moveTo(pL.sx,pL.sy); ctx.lineTo(pR.sx,pR.sy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pU.sx,pU.sy); ctx.lineTo(pD.sx,pD.sy); ctx.stroke();
+  ctx.beginPath(); ctx.arc(p.sx, p.sy, 2.5*p.scale, 0, Math.PI*2);
+  ctx.fillStyle = '#3ec878'; ctx.fill();
+  ctx.restore();
+}
+
 /* Ko gösterge imleci — yanıp sönen çarpı (kırmızı=yasak, yeşil=serbest) */
 function drawKoPoint({x, y, color}) {
   const col = color === 'green' ? '#27ae60' : '#e03030';
@@ -988,6 +1011,7 @@ function render() {
   if(CUR_STEP_DATA) drawLiberties(CUR_STEP_DATA);
   if(CUR_STEP_DATA) drawMarkers(CUR_STEP_DATA);
   if(CUR_STEP_DATA) drawGroupIndicators(CUR_STEP_DATA);
+  drawNextMoveHint();
   if(koPoint) drawKoPoint(koPoint);
   if(CUR_STEP_DATA?.blackTerritory?.length) drawTerritory(CUR_STEP_DATA.blackTerritory, 'black');
   if(CUR_STEP_DATA?.whiteTerritory?.length) drawTerritory(CUR_STEP_DATA.whiteTerritory, 'white');
@@ -1353,8 +1377,8 @@ const CURRICULUM = [
           {color:'W',x:4,y:8,capture:[]},{color:'B',x:4,y:7,capture:[]},
           {color:'W',x:5,y:8,capture:[]},{color:'B',x:6,y:8,capture:[]},
           {color:'W',x:5,y:7,capture:[]},{color:'B',x:5,y:6,capture:[]},
-          {color:'W',x:6,y:7,capture:[]},{color:'B',x:7,y:7,capture:[]},
-          {color:'W',x:6,y:6,capture:[]},{color:'B',x:6,y:5,capture:[]},
+          {color:'W',x:6,y:7,capture:[]},{color:'B',x:7,y:7,capture:[],speed:0.12},
+          {color:'W',x:6,y:6,capture:[],speed:0.12},{color:'B',x:6,y:5,capture:[],speed:0.12},
           {color:'W',x:7,y:6,capture:[],speed:0.12},{color:'B',x:8,y:6,capture:[],speed:0.12},
           {color:'W',x:7,y:5,capture:[],speed:0.12},{color:'B',x:7,y:4,capture:[],speed:0.12},
           {color:'W',x:8,y:5,capture:[],speed:0.12},{color:'B',x:9,y:5,capture:[],speed:0.12},
@@ -1430,6 +1454,7 @@ const TOTAL_LESSONS = ALL_LESSONS.length;
 let doneLessons = new Set(JSON.parse(localStorage.getItem('go_done_3d')||'[]'));
 let CUR_LESSON = null, CUR_STEP = 0, stepDone = false, CUR_STEP_DATA = null;
 let koPoint = null;
+let nextMoveHint = null;
 
 function loadLesson(lesson) {
   CUR_LESSON=lesson; CUR_STEP=0;
@@ -1442,6 +1467,7 @@ function loadStep(idx) {
   CUR_STEP=idx; CUR_STEP_DATA=step; stepDone=false;
   ghostActive=false; rotateMode=false;
   koPoint = step.initialKoIndicator || null;
+  nextMoveHint = null;
 
   const chap = CURRICULUM.find(c=>c.lessons.some(l=>l.id===CUR_LESSON.id));
   document.getElementById('chapter-tag').textContent   = chap?.title||'';
@@ -1494,11 +1520,14 @@ function playMoves(moves, step) {
   function next() {
     if(i >= moves.length) {
       if(step?.koPoint) koPoint = step.koPoint;
+      nextMoveHint = null;
       return;
     }
     const mv = moves[i++];
     const sp = mv.speed !== undefined ? mv.speed : defaultSp;
+    nextMoveHint = null;
     game.seed(mv.x, mv.y, mv.color);
+    if(i < moves.length) nextMoveHint = {x: moves[i].x, y: moves[i].y};
     setTimeout(() => {
       if(mv.capture) mv.capture.forEach(c => game.removeStone(c.x, c.y));
       if('indicatorAfter' in mv) koPoint = mv.indicatorAfter;
