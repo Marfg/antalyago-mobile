@@ -1417,7 +1417,15 @@ const CURRICULUM = [
     ]},
 
     { id:'l11', title:'Ağ (Geta)', steps:[
-      { text:`<p><span class="term">Ağ</span> (Japonca: <em>geta</em>) — bir taşı atari yapmadan, kaçış yollarını keserek tuzağa düşürmek.</p><p>Beyazın kaçış yolunu kesen noktayı bul — <strong>F6 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:3},{color:'B',x:5,y:3},{color:'B',x:6,y:4},{color:'B',x:6,y:5}], answer:{x:5,y:5}, turn:'black', size:9, fb:{t:'Beyazın tüm kaçış yollarını kapat!',c:'info'}, fb_ok:'Ağ kuruldu! Beyaz kaçamaz.', fb_err:'Beyazın kaçış yollarını kapatan noktayı bul.' },
+      { text:`<p><span class="term">Ağ</span> (Japonca: <em>geta</em>) — bir taşı atari yapmadan, kaçış yollarını keserek tuzağa düşürmek.</p><p>Beyazın kaçış yolunu kesen noktayı bul — <strong>F6 noktasına tıkla.</strong></p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:3},{color:'B',x:3,y:4},{color:'B',x:4,y:5},{color:'B',x:5,y:5}], answer:{x:5,y:3}, turn:'black', size:9,
+        movesAfterAnswer:[
+          {color:'W',x:4,y:3,capture:[]},
+          {color:'B',x:4,y:2,capture:[]},
+          {color:'W',x:5,y:4,capture:[]},
+          {color:'B',x:6,y:4,capture:[]},
+        ],
+        fb:{t:'Beyazın tüm kaçış yollarını kapat!',c:'info'}, fb_ok:'Ağ kuruldu! Beyaz kaçmaya çalışıyor ama tuzakta.', fb_err:'Beyazın kaçış yollarını kapatan noktayı bul.' },
+      { text:`<p>Bir örnek daha — <strong>Beyazın kaçış yolunu kesen noktayı bul.</strong></p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:3},{color:'B',x:5,y:3},{color:'B',x:6,y:4},{color:'B',x:6,y:5}], answer:{x:5,y:5}, turn:'black', size:9, fb:{t:'Beyazın tüm kaçış yollarını kapat!',c:'info'}, fb_ok:'Ağ kuruldu! Beyaz kaçamaz.', fb_err:'Beyazın kaçış yollarını kapatan noktayı bul.' },
     ]},
 
     { id:'l12', title:'Snapback', steps:[
