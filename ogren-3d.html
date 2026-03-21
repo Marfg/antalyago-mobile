@@ -506,7 +506,8 @@ function project(x, y, z) {
 
 let SIZE = 9, CELL = 48, HALF = (SIZE-1)*CELL/2;
 const BOARD_H = 14;
-const STONE_R = 20, ASPECT_3D = 0.36, ANIM_DUR = 0.20;
+let STONE_R = 20; // CELL ile orantılı güncellenir: CELL * (20/48)
+const ASPECT_3D = 0.36, ANIM_DUR = 0.20;
 
 function stoneRadii(p, mul) {
   mul = mul || 1;
@@ -1165,6 +1166,7 @@ window.setBoardSize = function(n) {
   SIZE = n;
   CELL = n===9 ? 48 : n===13 ? 32 : 22;
   HALF = (SIZE-1)*CELL/2;
+  STONE_R = CELL * (20/48);
   game.reset();
   document.querySelectorAll('.bp-btn').forEach(b=>b.classList.toggle('active', +b.dataset.size===n));
   document.getElementById('bp-desc').textContent = BP_DESCS[n];
@@ -1247,15 +1249,39 @@ const CURRICULUM = [
   { id:'c2', title:'Temel Teknikler', lessons:[
 
     { id:'l7', title:'Canlı Gruplar (İki Göz)', steps:[
-      { text:`<p>Bir grup <strong>iki göze</strong> sahipse asla yakalanamaz — <em>ölümsüzdür.</em></p><p><span class="term">Göz</span> = grubun içindeki boş nokta. Orta duvar grubu ikiye bölerek <strong>iki ayrı göz</strong> oluşturuyor. <strong>△ işaretler</strong> iki gözü gösteriyor.</p>`, size:9, board:[
-        {color:'B',x:0,y:0},{color:'B',x:1,y:0},{color:'B',x:2,y:0},{color:'B',x:3,y:0},{color:'B',x:4,y:0},
-        {color:'B',x:0,y:1},{color:'B',x:4,y:1},
-        {color:'B',x:0,y:2},{color:'B',x:2,y:2},{color:'B',x:4,y:2},
-        {color:'B',x:0,y:3},{color:'B',x:4,y:3},
-        {color:'B',x:0,y:4},{color:'B',x:1,y:4},{color:'B',x:2,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:4},
+      { text:`<p>Bir grup <strong>iki göze</strong> sahipse asla yakalanamaz — <em>ölümsüzdür.</em></p><p><span class="term">Göz</span> = grubun içindeki boş nokta. Tahtadaki her siyah grup farklı bir köşe veya kenarda iki göze sahip. <strong>△ işaretler</strong> gözleri, <strong>□ işaretler</strong> alt gruptaki ek göz noktalarını gösteriyor.</p>`, size:19, board:[
+        {color:'W',x:2,y:0},{color:'W',x:6,y:0},{color:'W',x:12,y:0},{color:'W',x:15,y:0},
+        {color:'W',x:2,y:1},{color:'W',x:6,y:1},{color:'W',x:12,y:1},{color:'W',x:15,y:1},
+        {color:'W',x:2,y:2},{color:'W',x:6,y:2},{color:'W',x:7,y:2},{color:'W',x:8,y:2},{color:'W',x:9,y:2},{color:'W',x:10,y:2},{color:'W',x:11,y:2},{color:'W',x:12,y:2},{color:'W',x:15,y:2},
+        {color:'W',x:2,y:3},{color:'W',x:15,y:3},{color:'W',x:16,y:3},{color:'W',x:17,y:3},{color:'W',x:18,y:3},
+        {color:'W',x:0,y:4},{color:'W',x:1,y:4},{color:'W',x:2,y:4},
+        {color:'W',x:8,y:7},{color:'W',x:9,y:7},{color:'W',x:10,y:7},
+        {color:'W',x:7,y:8},{color:'W',x:11,y:8},
+        {color:'W',x:6,y:9},{color:'W',x:11,y:9},
+        {color:'W',x:6,y:10},{color:'W',x:11,y:10},
+        {color:'W',x:6,y:11},{color:'W',x:11,y:11},
+        {color:'W',x:6,y:12},{color:'W',x:7,y:12},{color:'W',x:8,y:12},{color:'W',x:9,y:12},{color:'W',x:10,y:12},
+        {color:'W',x:15,y:15},{color:'W',x:16,y:15},{color:'W',x:17,y:15},{color:'W',x:18,y:15},
+        {color:'W',x:0,y:16},{color:'W',x:1,y:16},{color:'W',x:2,y:16},{color:'W',x:3,y:16},{color:'W',x:4,y:16},{color:'W',x:6,y:16},{color:'W',x:7,y:16},{color:'W',x:8,y:16},{color:'W',x:9,y:16},{color:'W',x:10,y:16},{color:'W',x:11,y:16},{color:'W',x:12,y:16},{color:'W',x:15,y:16},
+        {color:'W',x:4,y:17},{color:'W',x:6,y:17},{color:'W',x:12,y:17},{color:'W',x:15,y:17},{color:'W',x:18,y:17},
+        {color:'W',x:1,y:18},{color:'W',x:4,y:18},{color:'W',x:6,y:18},{color:'W',x:9,y:18},{color:'W',x:12,y:18},{color:'W',x:15,y:18},
+        {color:'B',x:1,y:0},{color:'B',x:7,y:0},{color:'B',x:9,y:0},{color:'B',x:11,y:0},{color:'B',x:16,y:0},{color:'B',x:17,y:0},
+        {color:'B',x:0,y:1},{color:'B',x:1,y:1},{color:'B',x:7,y:1},{color:'B',x:8,y:1},{color:'B',x:9,y:1},{color:'B',x:10,y:1},{color:'B',x:11,y:1},{color:'B',x:16,y:1},{color:'B',x:18,y:1},
+        {color:'B',x:1,y:2},{color:'B',x:16,y:2},{color:'B',x:17,y:2},{color:'B',x:18,y:2},
+        {color:'B',x:0,y:3},{color:'B',x:1,y:3},
+        {color:'B',x:8,y:8},{color:'B',x:9,y:8},
+        {color:'B',x:8,y:9},{color:'B',x:10,y:9},
+        {color:'B',x:7,y:10},{color:'B',x:9,y:10},{color:'B',x:10,y:10},
+        {color:'B',x:7,y:11},{color:'B',x:8,y:11},{color:'B',x:9,y:11},
+        {color:'B',x:16,y:16},{color:'B',x:17,y:16},{color:'B',x:18,y:16},
+        {color:'B',x:0,y:17},{color:'B',x:1,y:17},{color:'B',x:2,y:17},{color:'B',x:3,y:17},{color:'B',x:7,y:17},{color:'B',x:8,y:17},{color:'B',x:9,y:17},{color:'B',x:10,y:17},{color:'B',x:11,y:17},{color:'B',x:16,y:17},
+        {color:'B',x:3,y:18},{color:'B',x:7,y:18},{color:'B',x:11,y:18},{color:'B',x:16,y:18},{color:'B',x:17,y:18},
       ], markers:[
-        {x:1,y:2,type:'triangle'},{x:3,y:2,type:'triangle'},
-      ], auto:true, camera:CAM.center, fb:{t:'Her △ işareti bir gözü gösteriyor — iki göz = ölümsüz grup!',c:'info'} },
+        {x:0,y:0,type:'triangle'},{x:8,y:0,type:'triangle'},{x:10,y:0,type:'triangle'},{x:18,y:0,type:'triangle'},
+        {x:17,y:1,type:'triangle'},{x:0,y:2,type:'triangle'},{x:9,y:9,type:'triangle'},{x:8,y:10,type:'triangle'},
+        {x:17,y:17,type:'square'},{x:0,y:18,type:'square'},{x:2,y:18,type:'square'},
+        {x:8,y:18,type:'square'},{x:10,y:18,type:'square'},{x:18,y:18,type:'square'},
+      ], auto:true, camera:CAM.board19, fb:{t:'Her △ işareti bir gözü gösteriyor — 5 grup, hepsi iki göze sahip, ölümsüz!',c:'info'} },
       { text:`<p><strong>Sahte göz</strong> — rakip tarafından doldurulabilecek nokta gerçek göz değildir.</p><div class="highlight-box">İki gerçek göz = ölümsüz grup. Go'nun en temel kavramlarından biridir.</div>`, board:[{color:'B',x:2,y:2},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:2,y:3},{color:'B',x:4,y:3},{color:'B',x:2,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:4}], auto:true, size:9, fb:{t:'Bu grubun tek gözü var — ölümsüz değil!',c:'info'} },
     ]},
 
@@ -1340,7 +1366,7 @@ function loadStep(idx) {
   /* Board size — adıma özgü boyutu uygula, sonra tahtayı sıfırla */
   if(!step.boardSelector) {
     const ns = step.size || 9;
-    if(ns !== SIZE) { SIZE=ns; CELL=ns===9?48:ns===13?32:22; HALF=(SIZE-1)*CELL/2; }
+    if(ns !== SIZE) { SIZE=ns; CELL=ns===9?48:ns===13?32:22; HALF=(SIZE-1)*CELL/2; STONE_R=CELL*(20/48); }
   }
   document.getElementById('board-picker').classList.toggle('show', !!step.boardSelector);
 
