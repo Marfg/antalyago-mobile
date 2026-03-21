@@ -244,11 +244,45 @@
       background: rgba(200,168,75,.05); border-radius: 4px; border-left: 2px solid var(--gborder); }
 
     @media (max-width: 768px) {
-      #sidebar  { display: none; }
-      #sb-toggle { display: none; }
-      #lesson-panel, #nav-bar { width: 100%; left: 0; }
+      #sidebar, #sb-toggle, #hint { display: none; }
+      #lesson-panel, #nav-bar { width: 100%; left: 0; border-left: none; }
       #rotate-toggle { left: 10px; }
-      #hint { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      /* Topbar: progress bar gizle, daha kompakt */
+      .prog-wrap { display: none; }
+      .page-title { font-size: .88rem; }
+
+      /* Lesson panel: sağ yan panel → altta bottom sheet */
+      #lesson-panel {
+        top: auto;
+        bottom: 56px;
+        left: 0; right: 0; width: 100%;
+        max-height: 44vh;
+        border-left: none;
+        border-top: 1px solid var(--gborder);
+        padding: .85rem 1rem;
+        gap: .6rem;
+      }
+
+      /* Nav bar: tam genişlik */
+      #nav-bar {
+        left: 0; right: 0; width: 100%;
+        border-left: none;
+      }
+
+      /* Rotate toggle: sol üst köşeye */
+      #rotate-toggle {
+        bottom: auto;
+        top: 56px;
+        left: 10px;
+      }
+
+      /* Font küçült */
+      #lesson-title { font-size: 1rem; }
+      #lesson-body  { font-size: .82rem; line-height: 1.65; }
+      #feedback     { font-size: .75rem; }
     }
   </style>
 </head>
@@ -886,6 +920,52 @@ canvas.addEventListener('click',e=>{
 canvas.addEventListener('wheel',e=>{
   camDist=Math.max(180,Math.min(960,camDist+e.deltaY*.5));
 },{passive:true});
+
+/* ── TOUCH EVENTS ── */
+let pinchDist0 = null;
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    dragFrom={x:t.clientX,y:t.clientY};
+    lastM={x:t.clientX,y:t.clientY};
+    isDrag=false;
+  } else if(e.touches.length===2){
+    pinchDist0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    const dx=t.clientX-lastM.x, dy=t.clientY-lastM.y;
+    if(Math.hypot(t.clientX-dragFrom.x,t.clientY-dragFrom.y)>6){
+      isDrag=true;
+      if(!CUR_STEP_DATA||CUR_STEP_DATA.auto||rotateMode){
+        camYaw+=dx*.007; camPitch+=dy*.007;
+        camPitch=Math.max(.08,Math.min(1.48,camPitch));
+      }
+    }
+    ghostGrid=screenToGrid(t.clientX,t.clientY);
+    lastM={x:t.clientX,y:t.clientY};
+  } else if(e.touches.length===2 && pinchDist0){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    camDist=Math.max(180,Math.min(960,camDist-(d-pinchDist0)*.8));
+    pinchDist0=d;
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  pinchDist0=null;
+  if(!isDrag && e.changedTouches.length===1){
+    const t=e.changedTouches[0];
+    const g=screenToGrid(t.clientX,t.clientY);
+    if(g) onClick3D(g.gx,g.gz);
+  }
+  ghostGrid=null;
+},{passive:false});
 
 const BP_SIZES = [9, 13, 19];
 const BP_DESCS = {
