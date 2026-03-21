@@ -755,6 +755,40 @@ function drawLiberties(step) {
   });
 }
 
+/* SGF marker işaretleri — üçgen (TR) ve kare (SQ) */
+function drawMarkers(step) {
+  if(!step || !step.markers) return;
+  const Y = -BOARD_H/2 - .3;
+  step.markers.forEach(({x, y, type}) => {
+    const wx = -HALF + x*CELL;
+    const wz = -HALF + y*CELL;
+    const p  = project(wx, Y, wz);
+    if(p.scale < 0.12) return;
+    const arm = CELL * 0.28;
+    ctx.save();
+    ctx.lineWidth = Math.max(1, 1.8 * p.scale);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if(type === 'triangle') {
+      const pT = project(wx,          Y, wz - arm);
+      const pL = project(wx - arm*.87, Y, wz + arm*.5);
+      const pR = project(wx + arm*.87, Y, wz + arm*.5);
+      ctx.beginPath();
+      ctx.moveTo(pT.sx,pT.sy); ctx.lineTo(pL.sx,pL.sy); ctx.lineTo(pR.sx,pR.sy);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(200,168,75,.90)'; ctx.stroke();
+    } else if(type === 'square') {
+      const pTL = project(wx-arm,Y,wz-arm), pTR = project(wx+arm,Y,wz-arm);
+      const pBR = project(wx+arm,Y,wz+arm), pBL = project(wx-arm,Y,wz+arm);
+      ctx.beginPath();
+      ctx.moveTo(pTL.sx,pTL.sy); ctx.lineTo(pTR.sx,pTR.sy);
+      ctx.lineTo(pBR.sx,pBR.sy); ctx.lineTo(pBL.sx,pBL.sy);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(200,168,75,.70)'; ctx.stroke();
+    }
+    ctx.restore();
+  });
+}
+
 /* Ko gösterge imleci — yanıp sönen çarpı (kırmızı=yasak, yeşil=serbest) */
 function drawKoPoint({x, y, color}) {
   const col = color === 'green' ? '#27ae60' : '#e03030';
@@ -924,6 +958,7 @@ function render() {
 
   if(CUR_STEP_DATA && !CUR_STEP_DATA.auto) drawHighlights(CUR_STEP_DATA);
   if(CUR_STEP_DATA) drawLiberties(CUR_STEP_DATA);
+  if(CUR_STEP_DATA) drawMarkers(CUR_STEP_DATA);
   if(koPoint) drawKoPoint(koPoint);
   if(CUR_STEP_DATA?.blackTerritory?.length) drawTerritory(CUR_STEP_DATA.blackTerritory, 'black');
   if(CUR_STEP_DATA?.whiteTerritory?.length) drawTerritory(CUR_STEP_DATA.whiteTerritory, 'white');
@@ -1009,6 +1044,7 @@ const CAM = {
   corner_tl:{yaw:.85,pitch:.95,dist:420},
   corner_tr:{yaw:.15,pitch:.95,dist:420},
   center:   {yaw:.50,pitch:1.08,dist:460},
+  board19:  {yaw:.50,pitch:1.25,dist:520},
 };
 
 /* Mouse */
@@ -1211,7 +1247,39 @@ const CURRICULUM = [
   { id:'c2', title:'Temel Teknikler', lessons:[
 
     { id:'l7', title:'Canlı Gruplar (İki Göz)', steps:[
-      { text:`<p>Bir grup <strong>iki göze</strong> sahipse asla yakalanamaz — <em>ölümsüzdür.</em></p><p><span class="term">Göz</span> = grubun içindeki, rakibin hiçbir zaman dolduramayacağı boş nokta.</p>`, board:[{color:'B',x:0,y:0},{color:'B',x:1,y:0},{color:'B',x:2,y:0},{color:'B',x:3,y:0},{color:'B',x:4,y:0},{color:'B',x:0,y:1},{color:'B',x:4,y:1},{color:'B',x:0,y:2},{color:'B',x:2,y:2},{color:'B',x:4,y:2},{color:'B',x:0,y:3},{color:'B',x:4,y:3},{color:'B',x:0,y:4},{color:'B',x:1,y:4},{color:'B',x:2,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:4}], auto:true, size:9, camera:CAM.corner_tl, fb:{t:'Bu grubun iki gözü var — ölümsüz!',c:'info'} },
+      { text:`<p>Bir grup <strong>iki göze</strong> sahipse asla yakalanamaz — <em>ölümsüzdür.</em></p><p><span class="term">Göz</span> = grubun içindeki boş nokta. <strong>△ işaretler</strong> her grubun iki gözünü, <strong>□ işaretler</strong> de büyük grupta ikinci gözleri gösteriyor.</p>`, size:19, board:[
+        {color:'W',x:2,y:0},{color:'W',x:6,y:0},{color:'W',x:12,y:0},{color:'W',x:15,y:0},
+        {color:'W',x:2,y:1},{color:'W',x:6,y:1},{color:'W',x:12,y:1},{color:'W',x:15,y:1},
+        {color:'W',x:2,y:2},{color:'W',x:6,y:2},{color:'W',x:7,y:2},{color:'W',x:8,y:2},{color:'W',x:9,y:2},{color:'W',x:10,y:2},{color:'W',x:11,y:2},{color:'W',x:12,y:2},{color:'W',x:15,y:2},
+        {color:'W',x:2,y:3},{color:'W',x:15,y:3},{color:'W',x:16,y:3},{color:'W',x:17,y:3},{color:'W',x:18,y:3},
+        {color:'W',x:0,y:4},{color:'W',x:1,y:4},{color:'W',x:2,y:4},
+        {color:'W',x:8,y:7},{color:'W',x:9,y:7},{color:'W',x:10,y:7},
+        {color:'W',x:7,y:8},{color:'W',x:11,y:8},
+        {color:'W',x:6,y:9},{color:'W',x:11,y:9},
+        {color:'W',x:6,y:10},{color:'W',x:11,y:10},
+        {color:'W',x:6,y:11},{color:'W',x:11,y:11},
+        {color:'W',x:6,y:12},{color:'W',x:7,y:12},{color:'W',x:8,y:12},{color:'W',x:9,y:12},{color:'W',x:10,y:12},
+        {color:'W',x:15,y:15},{color:'W',x:16,y:15},{color:'W',x:17,y:15},{color:'W',x:18,y:15},
+        {color:'W',x:0,y:16},{color:'W',x:1,y:16},{color:'W',x:2,y:16},{color:'W',x:3,y:16},{color:'W',x:4,y:16},{color:'W',x:6,y:16},{color:'W',x:7,y:16},{color:'W',x:8,y:16},{color:'W',x:9,y:16},{color:'W',x:10,y:16},{color:'W',x:11,y:16},{color:'W',x:12,y:16},{color:'W',x:15,y:16},
+        {color:'W',x:4,y:17},{color:'W',x:6,y:17},{color:'W',x:12,y:17},{color:'W',x:15,y:17},{color:'W',x:18,y:17},
+        {color:'W',x:1,y:18},{color:'W',x:4,y:18},{color:'W',x:6,y:18},{color:'W',x:9,y:18},{color:'W',x:12,y:18},{color:'W',x:15,y:18},
+        {color:'B',x:1,y:0},{color:'B',x:7,y:0},{color:'B',x:9,y:0},{color:'B',x:11,y:0},{color:'B',x:16,y:0},{color:'B',x:17,y:0},
+        {color:'B',x:0,y:1},{color:'B',x:1,y:1},{color:'B',x:7,y:1},{color:'B',x:8,y:1},{color:'B',x:9,y:1},{color:'B',x:10,y:1},{color:'B',x:11,y:1},{color:'B',x:16,y:1},{color:'B',x:18,y:1},
+        {color:'B',x:1,y:2},{color:'B',x:16,y:2},{color:'B',x:17,y:2},{color:'B',x:18,y:2},
+        {color:'B',x:0,y:3},{color:'B',x:1,y:3},
+        {color:'B',x:8,y:8},{color:'B',x:9,y:8},
+        {color:'B',x:8,y:9},{color:'B',x:10,y:9},
+        {color:'B',x:7,y:10},{color:'B',x:9,y:10},{color:'B',x:10,y:10},
+        {color:'B',x:7,y:11},{color:'B',x:8,y:11},{color:'B',x:9,y:11},
+        {color:'B',x:16,y:16},{color:'B',x:17,y:16},{color:'B',x:18,y:16},
+        {color:'B',x:0,y:17},{color:'B',x:1,y:17},{color:'B',x:2,y:17},{color:'B',x:3,y:17},{color:'B',x:7,y:17},{color:'B',x:8,y:17},{color:'B',x:9,y:17},{color:'B',x:10,y:17},{color:'B',x:11,y:17},{color:'B',x:16,y:17},
+        {color:'B',x:3,y:18},{color:'B',x:7,y:18},{color:'B',x:11,y:18},{color:'B',x:16,y:18},{color:'B',x:17,y:18},
+      ], markers:[
+        {x:0,y:0,type:'triangle'},{x:8,y:0,type:'triangle'},{x:10,y:0,type:'triangle'},{x:18,y:0,type:'triangle'},
+        {x:17,y:1,type:'triangle'},{x:0,y:2,type:'triangle'},{x:9,y:9,type:'triangle'},{x:8,y:10,type:'triangle'},
+        {x:17,y:17,type:'square'},{x:0,y:18,type:'square'},{x:2,y:18,type:'square'},
+        {x:8,y:18,type:'square'},{x:10,y:18,type:'square'},{x:18,y:18,type:'square'},
+      ], auto:true, camera:CAM.board19, fb:{t:'Her △ işareti bir gözü gösteriyor — gruplar iki göze sahip, ölümsüz!',c:'info'} },
       { text:`<p><strong>Sahte göz</strong> — rakip tarafından doldurulabilecek nokta gerçek göz değildir.</p><div class="highlight-box">İki gerçek göz = ölümsüz grup. Go'nun en temel kavramlarından biridir.</div>`, board:[{color:'B',x:2,y:2},{color:'B',x:3,y:2},{color:'B',x:4,y:2},{color:'B',x:2,y:3},{color:'B',x:4,y:3},{color:'B',x:2,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:4}], auto:true, size:9, fb:{t:'Bu grubun tek gözü var — ölümsüz değil!',c:'info'} },
     ]},
 
@@ -1293,6 +1361,13 @@ function loadStep(idx) {
   document.getElementById('mprev').disabled     = (idx===0);
   renderDots();
 
+  /* Board size — adıma özgü boyutu uygula, sonra tahtayı sıfırla */
+  if(!step.boardSelector) {
+    const ns = step.size || 9;
+    if(ns !== SIZE) { SIZE=ns; CELL=ns===9?48:ns===13?32:22; HALF=(SIZE-1)*CELL/2; }
+  }
+  document.getElementById('board-picker').classList.toggle('show', !!step.boardSelector);
+
   /* Clear board, then seed */
   game.reset();
   if(step.turn) game.turn = step.turn==='black'?'black':'white';
@@ -1303,10 +1378,6 @@ function loadStep(idx) {
 
   /* Feedback */
   setFb(step.fb?.t||'Tahtayı inceleyin.', step.fb?.c||'info');
-
-  /* Board picker visibility — boyutu her adımda 9x9'a sıfırla */
-  if(!step.boardSelector && SIZE !== 9) { SIZE=9; CELL=48; HALF=(SIZE-1)*CELL/2; }
-  document.getElementById('board-picker').classList.toggle('show', !!step.boardSelector);
 
   /* Mode */
   if(step.auto || step.moves?.length) {
