@@ -1322,27 +1322,24 @@ const CURRICULUM = [
     ]},
 
     { id:'l9', title:'Çift Atari', steps:[
-      { text:`<p><span class="term">Çift atari</span> — tek hamleyle iki ayrı gruba aynı anda atari. Beyaz ikisini birden kurtaramaz; biri mutlaka yakalanır.</p><p>△ işareti her iki beyazı da tehdit eden noktayı gösteriyor.</p>`,
+      { text:`<p><span class="term">Çift atari</span> — tek hamleyle iki ayrı grubu aynı anda atariye almak. Beyaz ikisini birden kurtaramaz.</p><p>Çift atari noktasını bul ve oyna!</p>`,
         board:[{color:'W',x:5,y:3},{color:'W',x:4,y:4},{color:'B',x:6,y:3},{color:'B',x:5,y:4},{color:'B',x:4,y:5}],
-        markers:[{x:4,y:3,type:'triangle'}],
-        auto:true, size:9, camera:CAM.center, fb:{t:'Bu tek noktadan oynayınca her iki beyaz da atariye girer.',c:'info'} },
+        answer:{x:4,y:3}, turn:'black', size:9, camera:CAM.center,
+        movesAfterAnswer:[{color:'W',x:5,y:2,capture:[]},{color:'B',x:3,y:4,capture:[{x:4,y:4}]}],
+        fb:{t:'İki beyazı aynı anda atariye alacak noktayı bul!',c:'info'},
+        fb_ok:'Çift atari! Sağdaki kurtarılırsa sol yakalanır — ya solu kurtarırsa?',
+        fb_err:'Her iki beyaz gruba da atari yapacak noktayı bul.' },
 
-      { text:`<p>Çift atari noktasını bul ve oyna — <strong>△ noktasına tıkla.</strong></p>`,
-        board:[{color:'W',x:5,y:3},{color:'W',x:4,y:4},{color:'B',x:6,y:3},{color:'B',x:5,y:4},{color:'B',x:4,y:5}],
-        answer:{x:4,y:3}, turn:'black', size:9,
-        fb:{t:'İki beyazı aynı anda atariye al!',c:'info'}, fb_ok:'Çift atari! Beyaz ikisini birden kurtaramaz.', fb_err:'Her iki beyaz gruba da atari yapacak noktayı bul.' },
-
-      { text:`<p><strong>Dal A —</strong> Beyaz sağdaki taşı kurtarırsa… sol taş yakalanır.</p>`,
+      { text:`<p>Şimdi <strong>beyaz olarak</strong> oyna — hangi taşı kurtarırsın?</p><div class="highlight-box">Hangisini seçersen seç, diğer taş yakalanır.</div>`,
         board:[{color:'W',x:5,y:3},{color:'W',x:4,y:4},{color:'B',x:4,y:3},{color:'B',x:6,y:3},{color:'B',x:5,y:4},{color:'B',x:4,y:5}],
-        moves:[{color:'W',x:5,y:2,capture:[]},{color:'B',x:3,y:4,capture:[{x:4,y:4}]}],
-        moveSpeed:1.4, auto:true, size:9, camera:CAM.center,
-        fb:{t:'Beyaz sağı kurtardı — ama sol taş yakalandı.',c:'info'} },
-
-      { text:`<p><strong>Dal B —</strong> Beyaz sol taşı kurtarırsa… sağdaki yakalanır.</p><div class="highlight-box">Çift atariden kaçış yoktur: beyaz her seçimde bir taşını kaybeder.</div>`,
-        board:[{color:'W',x:5,y:3},{color:'W',x:4,y:4},{color:'B',x:4,y:3},{color:'B',x:6,y:3},{color:'B',x:5,y:4},{color:'B',x:4,y:5}],
-        moves:[{color:'W',x:3,y:4,capture:[]},{color:'B',x:5,y:2,capture:[{x:5,y:3}]}],
-        moveSpeed:1.4, auto:true, size:9, camera:CAM.center,
-        fb:{t:'Beyaz solu kurtardı — ama bu sefer sağ taş yakalandı.',c:'info'} },
+        answers:[{x:5,y:2},{x:3,y:4}], turn:'white', size:9, camera:CAM.center,
+        movesAfterAnswerMap:{
+          '5,2':[{color:'B',x:3,y:4,capture:[{x:4,y:4}]}],
+          '3,4':[{color:'B',x:5,y:2,capture:[{x:5,y:3}]}]
+        },
+        fb:{t:'Beyaz taşlardan birinin yanındaki boş noktaya oyna.',c:'info'},
+        fb_ok:'Bir taşı kurtardın — ama diğeri yakalandı. Çift atariden kaçış yoktur!',
+        fb_err:'Beyaz taşlardan birini kurtarmak için yanındaki boş noktaya oyna.' },
     ]},
 
     { id:'l10', title:'Merdiven (Shicho)', steps:[
@@ -1482,6 +1479,12 @@ function onClick3D(gx,gz) {
     stepDone=true; ghostActive=false;
     if(step.capture) {
       setTimeout(()=>{ step.capture.forEach(c=>game.removeStone(c.x,c.y)); },380);
+    }
+    if(step.movesAfterAnswer) {
+      setTimeout(()=>playMoves(step.movesAfterAnswer, step), 500);
+    } else if(step.movesAfterAnswerMap) {
+      const movesAfter = step.movesAfterAnswerMap[`${gx},${gz}`];
+      if(movesAfter) setTimeout(()=>playMoves(movesAfter, step), 500);
     }
     updateNextBtn(step);
   } else {
