@@ -1439,6 +1439,17 @@ const CURRICULUM = [
           {color:'B',x:3,y:4,capture:[{x:3,y:5},{x:4,y:4},{x:4,y:5}]},
         ],
         fb:{t:'Kurbanı ver — beyaz alacak ama daha büyük grubu kaybedecek!',c:'info'}, fb_ok:'Snapback başladı! Beyaz kurbanı aldı ama tuzağa düştü.', fb_err:'D5 noktasına tıkla — kurbanı ver.' },
+      { text:`<p>Bir snapback örneği daha. Kurban ver — <strong>A5 noktasına tıkla.</strong></p>`,
+        board:[
+          {color:'W',x:0,y:2},{color:'W',x:1,y:2},{color:'W',x:2,y:2},{color:'W',x:3,y:2},{color:'W',x:0,y:3},{color:'W',x:1,y:4},{color:'W',x:1,y:5},
+          {color:'B',x:1,y:3},{color:'B',x:2,y:3},{color:'B',x:2,y:4},{color:'B',x:2,y:5},{color:'B',x:0,y:6},{color:'B',x:1,y:6},
+        ],
+        answer:{x:0,y:4}, turn:'black', size:9,
+        movesAfterAnswer:[
+          {color:'W',x:0,y:5,capture:[{x:0,y:4}]},
+          {color:'B',x:0,y:4,capture:[{x:0,y:5},{x:1,y:4},{x:1,y:5}]},
+        ],
+        fb:{t:'Kurbanı ver — beyaz alacak ama grubu kaybedecek!',c:'info'}, fb_ok:'Snapback! Beyaz kurbanı aldı ama tuzağa düştü.', fb_err:'A5 noktasına tıkla — kurbanı ver.' },
     ]},
   ]},
 
