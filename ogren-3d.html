@@ -1343,8 +1343,41 @@ const CURRICULUM = [
     ]},
 
     { id:'l10', title:'Merdiven (Shicho)', steps:[
-      { text:`<p><span class="term">Merdiven</span> (Japonca: <em>shicho</em>) — bir taşı sürekli atari yaparak köşeye sürme tekniği.</p>`, board:[{color:'W',x:4,y:4},{color:'B',x:3,y:4},{color:'B',x:4,y:3}], auto:true, size:9, camera:CAM.overview, fb:{t:'Beyaz kaçmaya çalışır ama her adımda yakalanır.',c:'info'} },
-      { text:`<p>Merdiven işe yaraması için tahtada <strong>merdiveni kıran taş</strong> olmamalıdır.</p><div class="highlight-box">Merdivene başlamadan önce tüm tahtayı kontrol et.</div>`, board:[{color:'W',x:4,y:4},{color:'W',x:7,y:1},{color:'B',x:3,y:4},{color:'B',x:4,y:3}], auto:true, size:9, fb:{t:'H2\'deki beyaz taş merdiveni kırıyor!',c:'info'} },
+
+      { text:`<p><span class="term">Merdiven</span> (Japonca: <em>shicho</em>) — atariden kaçan taş her hamlede yeniden atariye girer ve köşeye doğru sürülür.</p><p>Beyaz kaçmaya çalıştıkça siyah kovalıyor — bu döngüyü izle.</p>`,
+        board:[
+          {color:'W',x:4,y:9},
+          {color:'B',x:3,y:8},{color:'B',x:3,y:9},{color:'B',x:5,y:9},{color:'B',x:4,y:10},
+        ],
+        moves:[
+          {color:'W',x:4,y:8,capture:[]},{color:'B',x:4,y:7,capture:[]},
+          {color:'W',x:5,y:8,capture:[]},{color:'B',x:6,y:8,capture:[]},
+          {color:'W',x:5,y:7,capture:[]},{color:'B',x:5,y:6,capture:[]},
+          {color:'W',x:6,y:7,capture:[]},{color:'B',x:7,y:7,capture:[]},
+        ],
+        moveSpeed:0.35, auto:true, size:13, camera:CAM.overview,
+        fb:{t:'Beyaz her kaçışta köşeye yaklaşıyor — merdiven sonunda onu sıkıştırır.',c:'info'} },
+
+      { text:`<p><strong>Merdiveni kıran taş</strong> — merdiven yolunda bir beyaz taş varsa, kaçan grup ona bağlanır ve kurtulur.</p><div class="highlight-box">Merdiven oynamadan önce taşın tüm yolunu kontrol et!</div>`,
+        board:[
+          {color:'W',x:4,y:9},{color:'W',x:9,y:4},
+          {color:'B',x:3,y:8},{color:'B',x:3,y:9},{color:'B',x:5,y:9},{color:'B',x:4,y:10},
+        ],
+        groupIndicators:[{x:9,y:4,color:'green'}],
+        moves:[
+          {color:'W',x:4,y:8,capture:[]},{color:'B',x:4,y:7,capture:[]},
+          {color:'W',x:5,y:8,capture:[]},{color:'B',x:6,y:8,capture:[]},
+          {color:'W',x:5,y:7,capture:[]},{color:'B',x:5,y:6,capture:[]},
+          {color:'W',x:6,y:7,capture:[]},{color:'B',x:7,y:7,capture:[]},
+          {color:'W',x:6,y:6,capture:[]},{color:'B',x:6,y:5,capture:[]},
+          {color:'W',x:7,y:6,capture:[]},{color:'B',x:8,y:6,capture:[]},
+          {color:'W',x:7,y:5,capture:[]},{color:'B',x:7,y:4,capture:[]},
+          {color:'W',x:8,y:5,capture:[]},{color:'B',x:9,y:5,capture:[]},
+          {color:'W',x:8,y:4,capture:[]},
+        ],
+        moveSpeed:0.22, auto:true, size:13, camera:CAM.overview,
+        fb:{t:'Beyaz (8,4) merdiveni kıran taşa bağlandı — artık köşeye sürülmez!',c:'info'} },
+
     ]},
 
     { id:'l11', title:'Ağ (Geta)', steps:[
