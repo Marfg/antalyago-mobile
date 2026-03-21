@@ -243,6 +243,20 @@
     .bp-desc { font-size: .74rem; color: var(--muted); line-height: 1.6; padding: .3rem .5rem;
       background: rgba(200,168,75,.05); border-radius: 4px; border-left: 2px solid var(--gborder); }
 
+    /* Hamburger butonu — sadece mobilde görünür */
+    .mob-menu-btn {
+      display: none; background: none; border: 1px solid var(--gborder);
+      color: var(--gold); border-radius: 6px; padding: 5px 10px;
+      font-size: 15px; cursor: pointer; line-height: 1;
+    }
+
+    /* Mobil overlay — menü açıkken arka plan karartma */
+    #mob-overlay {
+      display: none; position: fixed; inset: 0; z-index: 19;
+      background: rgba(0,0,0,.55);
+    }
+    #mob-overlay.show { display: block; }
+
     @media (max-width: 768px) {
       #sidebar, #sb-toggle, #hint { display: none; }
       #lesson-panel, #nav-bar { width: 100%; left: 0; border-left: none; }
@@ -250,39 +264,49 @@
     }
 
     @media (max-width: 640px) {
-      /* Topbar: progress bar gizle, daha kompakt */
+      /* Hamburger görünür, back-btn kısalt */
+      .mob-menu-btn { display: flex; align-items: center; }
       .prog-wrap { display: none; }
-      .page-title { font-size: .88rem; }
+      .page-title { font-size: .85rem; }
 
-      /* Lesson panel: sağ yan panel → altta bottom sheet */
+      /* Sidebar: mobilde tam yükseklik overlay */
+      #sidebar {
+        display: block;
+        width: 80vw; max-width: 300px;
+        transform: translateX(-100%);
+        z-index: 21;
+      }
+      #sidebar.mob-open { transform: translateX(0); }
+
+      /* Lesson panel: bottom sheet */
       #lesson-panel {
-        top: auto;
-        bottom: 56px;
+        top: auto; bottom: 56px;
         left: 0; right: 0; width: 100%;
         max-height: 44vh;
         border-left: none;
         border-top: 1px solid var(--gborder);
-        padding: .85rem 1rem;
-        gap: .6rem;
+        padding: .9rem 1rem .6rem;
+        gap: .55rem;
       }
 
-      /* Nav bar: tam genişlik */
+      /* Nav bar: tam genişlik, daha yüksek */
       #nav-bar {
         left: 0; right: 0; width: 100%;
-        border-left: none;
+        border-left: none; height: 60px; padding: 0 1rem;
       }
+      .nav-btn { padding: .55rem 1.1rem; font-size: .82rem; min-height: 44px; }
 
-      /* Rotate toggle: sol üst köşeye */
-      #rotate-toggle {
-        bottom: auto;
-        top: 56px;
-        left: 10px;
-      }
+      /* Rotate toggle: sol üste */
+      #rotate-toggle { bottom: auto; top: 56px; left: 10px; }
 
-      /* Font küçült */
-      #lesson-title { font-size: 1rem; }
-      #lesson-body  { font-size: .82rem; line-height: 1.65; }
-      #feedback     { font-size: .75rem; }
+      /* Adım noktaları: daha büyük dokunma hedefi */
+      .sdot { width: 11px; height: 11px; }
+      .step-dots { gap: .55rem; padding: .25rem 0; }
+
+      /* Font */
+      #lesson-title { font-size: 1.05rem; }
+      #lesson-body  { font-size: .83rem; line-height: 1.68; }
+      #feedback     { font-size: .76rem; padding: .55rem .8rem; }
     }
   </style>
 </head>
@@ -305,7 +329,8 @@
 <!-- Topbar -->
 <div id="topbar">
   <div class="tb-left">
-    <a class="back-btn" href="index.html">← Ana Sayfa</a>
+    <button class="mob-menu-btn" id="mob-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    <a class="back-btn" href="index.html">← Ana</a>
     <span class="page-title">Go Öğren 3D</span>
   </div>
   <div class="prog-wrap">
@@ -313,6 +338,9 @@
     <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
 </div>
+
+<!-- Mobil menü overlay -->
+<div id="mob-overlay" onclick="toggleMobileMenu()"></div>
 
 <!-- Sidebar toggle -->
 <button id="sb-toggle" onclick="toggleSidebar()">◀</button>
@@ -370,12 +398,22 @@
 const canvas = document.getElementById('c');
 const ctx    = canvas.getContext('2d');
 let W, H;
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; updateProjCenter(); }
 resize(); window.addEventListener('resize', resize);
 
 let camYaw = 0.50, camPitch = 0.88, camDist = 500;
 let camTarget = null, camStart = null, camLerpT = 1;
 const CAM_DUR = 0.65;
+
+let projCY = 0;
+function updateProjCenter() {
+  if(innerWidth <= 640) {
+    const panelH = Math.min(innerHeight * 0.44, 320);
+    projCY = 46 + (innerHeight - 46 - 56 - panelH) / 2;
+  } else {
+    projCY = H / 2;
+  }
+}
 
 function project(x, y, z) {
   const rx  =  x*Math.cos(camYaw)   + z*Math.sin(camYaw);
@@ -383,7 +421,7 @@ function project(x, y, z) {
   const ry2 =  y*Math.cos(camPitch) - rz*Math.sin(camPitch);
   const rz2 =  y*Math.sin(camPitch) + rz*Math.cos(camPitch);
   const fov = 700, sc = fov / Math.max(fov + rz2, 1) * (camDist/500);
-  return { sx: W/2 + rx*sc, sy: H/2 + ry2*sc, scale: sc, z: rz2 };
+  return { sx: W/2 + rx*sc, sy: projCY + ry2*sc, scale: sc, z: rz2 };
 }
 
 let SIZE = 9, CELL = 48, HALF = (SIZE-1)*CELL/2;
@@ -1006,6 +1044,13 @@ window.toggleSidebar = function() {
   sb.classList.toggle('collapsed');
   t.classList.toggle('collapsed');
   t.textContent = sb.classList.contains('collapsed') ? '▶' : '◀';
+};
+
+window.toggleMobileMenu = function() {
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('mob-overlay');
+  const open=sb.classList.toggle('mob-open');
+  ov.classList.toggle('show', open);
 };
 
 /* ═══════════════════════════════════════════════════════
