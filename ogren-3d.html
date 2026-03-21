@@ -171,21 +171,31 @@
     .nav-btn:disabled { opacity: .3; cursor: not-allowed; }
     #step-counter { font-size: .7rem; color: var(--muted); font-family: monospace; }
 
-    /* ── CANVAS NAV ARROWS (mobil) ── */
-    .cnav {
+    /* ── CANVAS NAV PILL ── */
+    #canvas-nav {
       position: fixed; z-index: 16;
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--glass); border: 1px solid var(--gborder);
-      color: var(--gold); font-size: 30px; line-height: 1;
-      cursor: pointer; backdrop-filter: blur(10px);
-      display: none; align-items: center; justify-content: center;
-      transition: background .18s, transform .12s; user-select: none;
-      padding-bottom: 2px;
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--glass); backdrop-filter: blur(14px);
+      border: 1px solid var(--gborder); border-radius: 50px;
+      padding: .3rem .5rem;
+      /* Masaüstü: canvas sol alt */
+      bottom: 16px; left: 238px;
     }
-    .cnav:active { background: rgba(200,168,75,.22); transform: scale(.92); }
-    .cnav:disabled { opacity: .2; pointer-events: none; }
-    #cnav-prev { left: 12px; }
-    #cnav-next { right: 12px; }
+    .cc-btn {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: transparent; border: 1px solid var(--gborder);
+      color: var(--gold); font-size: 26px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .12s; padding-bottom: 2px;
+      flex-shrink: 0;
+    }
+    .cc-btn:hover { background: rgba(200,168,75,.12); border-color: var(--gold); }
+    .cc-btn:active { transform: scale(.9); }
+    .cc-btn:disabled { opacity: .22; pointer-events: none; }
+    #cc-counter {
+      font-size: .72rem; color: var(--muted); font-family: monospace;
+      min-width: 5.5ch; text-align: center; padding: 0 .2rem;
+    }
 
     /* ── PANEL DRAG HANDLE ── */
     .panel-handle {
@@ -301,34 +311,29 @@
       }
       #sidebar.mob-open { transform: translateX(0); }
 
-      /* Canvas nav arrows */
-      .cnav { display: flex; }
-
       /* Drag handle */
       .panel-handle { display: block; }
 
-      /* Lesson panel: bottom sheet */
+      /* Lesson panel: saydam bottom sheet */
       #lesson-panel {
-        top: auto; bottom: 48px;
+        top: auto; bottom: 0;
         left: 0; right: 0; width: 100%;
         max-height: 46vh;
         border-left: none;
-        border-top: 1px solid var(--gborder);
-        padding: .5rem 1rem .7rem;
+        border-top: 1px solid rgba(200,168,75,.18);
+        padding: .5rem 1rem .8rem;
         gap: .5rem;
+        background: rgba(8,8,14,.48);
       }
 
       /* Bölüm etiketi gizle */
       .ch-tag { display: none; }
 
-      /* Nav bar: sadece sayaç */
-      #nav-bar {
-        left: 0; right: 0; width: 100%;
-        border-left: none; height: 48px;
-        justify-content: center; padding: 0;
-      }
-      #btn-prev, #btn-next { display: none; }
-      #step-counter { font-size: .8rem; letter-spacing: .05em; }
+      /* Nav bar tamamen gizle */
+      #nav-bar { display: none; }
+
+      /* Canvas nav pill: mobilde JS ile konumlandırılır, başlangıç */
+      #canvas-nav { bottom: 48vh; left: 50%; transform: translateX(-50%); }
 
       /* Rotate toggle */
       #rotate-toggle { bottom: auto; top: 56px; left: 10px; }
@@ -354,9 +359,12 @@
   <button class="nav-btn primary" onclick="closeComplete()" style="margin-top:.5rem">Devam Et →</button>
 </div>
 
-<!-- Canvas nav arrows -->
-<button class="cnav" id="cnav-prev" onclick="prevStep()">‹</button>
-<button class="cnav" id="cnav-next" onclick="nextStep()">›</button>
+<!-- Canvas navigation pill -->
+<div id="canvas-nav">
+  <button class="cc-btn" id="cnav-prev" onclick="prevStep()">‹</button>
+  <span id="cc-counter"></span>
+  <button class="cc-btn" id="cnav-next" onclick="nextStep()">›</button>
+</div>
 
 <!-- Canvas (3D board) -->
 <canvas id="c"></canvas>
@@ -445,16 +453,20 @@ let camTarget = null, camStart = null, camLerpT = 1;
 const CAM_DUR = 0.65;
 
 function updateProjCenter() {
+  const nav = document.getElementById('canvas-nav');
   if(innerWidth <= 640) {
     const panelH = Math.min(innerHeight * 0.46, 320);
-    projCY = 46 + (innerHeight - 46 - 48 - panelH) / 2;
-    const top = Math.round(projCY - 26) + 'px';
-    document.getElementById('cnav-prev').style.top = top;
-    document.getElementById('cnav-next').style.top = top;
+    projCY = 46 + (innerHeight - 46 - panelH) / 2;
+    // canvas-nav: panelin tam üstüne, merkeze
+    const navBottom = Math.round(panelH + 10);
+    nav.style.bottom = navBottom + 'px';
+    nav.style.left = '50%';
+    nav.style.transform = 'translateX(-50%)';
   } else {
     projCY = H / 2;
-    document.getElementById('cnav-prev').style.top = '';
-    document.getElementById('cnav-next').style.top = '';
+    nav.style.bottom = '';
+    nav.style.left = '';
+    nav.style.transform = '';
   }
 }
 
@@ -1237,8 +1249,10 @@ function loadStep(idx) {
   document.getElementById('chapter-tag').textContent   = chap?.title||'';
   document.getElementById('lesson-title').textContent  = CUR_LESSON.title;
   document.getElementById('lesson-body').innerHTML     = step.text;
-  document.getElementById('step-counter').textContent  = `Adım ${idx+1} / ${CUR_LESSON.steps.length}`;
-  document.getElementById('btn-prev').disabled = (idx===0);
+  const counterTxt = `${idx+1} / ${CUR_LESSON.steps.length}`;
+  document.getElementById('step-counter').textContent  = `Adım ${counterTxt}`;
+  document.getElementById('cc-counter').textContent    = counterTxt;
+  document.getElementById('btn-prev').disabled  = (idx===0);
   document.getElementById('cnav-prev').disabled = (idx===0);
   renderDots();
 
@@ -1349,6 +1363,7 @@ function updateNextBtn(step) {
   btn.disabled=!enabled;
   btn.textContent=isLast?'Dersi Bitir ✓':'İleri →';
   cnext.disabled=!enabled;
+  cnext.textContent=isLast?'✓':'›';
 }
 
 /* Sidebar */
